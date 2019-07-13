@@ -1,0 +1,20 @@
+server {
+	include         ports/http_default.conf;
+	include         limits/methods.conf;
+	include         locations/favicon.conf;
+	include         locations/favicon_apple.conf;
+	include         locations/static.conf;
+	include         locations/php.conf;
+
+	server_name "";
+	root {{ item.root }};
+    #{% if (item.basic_auth is defined) and (item.basic_auth is sameas true) %}
+    #    auth_basic "Restricted";
+    #    auth_basic_user_file {{ nginx_http_basic_auth_file }};
+    #{% endif %}
+
+    location /user/login {
+        auth_basic           "Злобный хацкер - ТЫ НЕ ПРОЙДЕШЬ!";
+        auth_basic_user_file {{ nginx_http_basic_auth_file }};
+    }
+}

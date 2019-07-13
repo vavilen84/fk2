@@ -1,0 +1,2 @@
+- name: Rewrite config file
+  template: src=db.php dest=/var/www/fk2/config/db.php

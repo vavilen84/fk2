@@ -1,0 +1,4 @@
+!.gitignore
+.svn
+.idea
+nbproject

@@ -1,0 +1,18 @@
+- hosts: all
+  become: true
+  gather_facts: true
+  vars_files:
+    - "vars/dev.yml"
+  roles:
+    - initial
+    - common
+    - ntpd
+    - remove-apache2
+    - remove-mcrypt
+    - nginx
+    - php7
+    - xdebug7
+    - mysql
+    - phpmyadmin
+    - after-provision
+    - ansible

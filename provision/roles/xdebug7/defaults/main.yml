@@ -1,0 +1,2 @@
+xdebug_remote_port: 9000
+xdebug_remote_host: 10.0.77.1

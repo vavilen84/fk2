@@ -1,0 +1,6 @@
+- name: set hostname
+  shell: hostname {{ hostname }}
+
+- name: Update apt cache
+  become: yes
+  apt: update_cache=yes

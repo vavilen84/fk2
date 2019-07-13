@@ -1,0 +1,51 @@
+server
+{
+    include     ports/http.conf;
+    server_name {{ item.server_name }};
+    return      301 https://{{ item.server_name }}$request_uri;
+}
+server
+{
+    include     ports/http.conf;
+    server_name www.{{ item.server_name }};
+    return      301 https://{{ item.server_name }}$request_uri;
+}
+server
+{
+    server_name www.{{ item.server_name }};
+    {% if (item.basic_auth is defined) and (item.basic_auth is sameas true) %}
+        auth_basic "Restricted";
+        auth_basic_user_file {{ nginx_http_basic_auth_file }};
+    {% endif %}
+
+    include enable/ssl.conf;
+	ssl_certificate    {{ nginx_certs_folder }}{{ item.ssl_certificate_file }};
+	ssl_certificate_key {{ nginx_certs_folder }}{{ item.ssl_certificate_key_file }};
+	ssl_dhparam {{ nginx_certs_folder }}{{ item.ssl_dhparam_file }};
+
+    include     ports/ssl.conf;
+    return      301 https://{{ item.server_name }}$request_uri;
+}
+server
+{
+    server_name {{ item.server_name }};
+    root        {{ item.root }};
+
+    include enable/ssl.conf;
+	ssl_certificate    {{ nginx_certs_folder }}{{ item.ssl_certificate_file }};
+	ssl_certificate_key {{ nginx_certs_folder }}{{ item.ssl_certificate_key_file }};
+	ssl_dhparam {{ nginx_certs_folder }}{{ item.ssl_dhparam_file }};
+
+    include         ports/ssl.conf;
+	include         limits/methods_static.conf;
+    include         locations/favicon.conf;
+    include         locations/favicon_apple.conf;
+	include         locations/static.conf;
+	include         enable/cors.conf;
+
+    ########## Your custom locations & settings ##########
+    location / {
+         index index.html;
+    }
+}
+

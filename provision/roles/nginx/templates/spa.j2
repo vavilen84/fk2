@@ -1,0 +1,27 @@
+server
+{
+    include     ports/http.conf;
+    server_name www.{{ item.server_name }};
+    return      301 http://{{ item.server_name }}$request_uri;
+}
+server
+{
+    server_name {{ item.server_name }};
+    root        {{ item.root }};
+
+    include         ports/http.conf;
+	include         limits/methods_static.conf;
+    include         locations/favicon.conf;
+    include         locations/favicon_apple.conf;
+	include         locations/static.conf;
+	include         enable/cors.conf;
+
+    ########## Your custom locations & settings ##########
+    location / {
+		if (!-e $request_filename){
+			rewrite ^(.*)$ /index.html break;
+		}
+        index index.html;
+    }
+}
+

@@ -1,0 +1,39 @@
+---
+# defaults file for nginx
+nginx_version: 1.8.0
+nginx_user: nginx
+nginx_group: nginx
+nginx_run_user: 'www-data'
+nginx_worker_processes: 1 # recomended: grep processor /proc/cpuinfo | wc -l
+nginx_worker_connections: 1024 # recomended: ulimit -n
+nginx_client_max_body_size: 10M
+nginx_keepalive_requests: 20
+nginx_keepalive_timeout: 30
+nginx_client_header_timeout: 15
+nginx_client_body_timeout: 15
+nginx_send_timeout: 10
+nginx_fastcgi_connect_timeout: 30
+nginx_fastcgi_send_timeout: 30
+nginx_fastcgi_read_timeout: 60
+nginx_php_unix_socket: /var/run/php/php7.1-fpm.sock
+
+# nginx modules
+nginx_include_headers_more_module: true
+nginx_headers_more_module_version: 0.29
+nginx_headers_more_module_base_url: https://github.com/openresty/headers-more-nginx-module/archive/
+
+# HTTP Basic authentication
+nginx_http_basic_auth_file: /etc/nginx/.htpasswd-users
+nginx_http_basic_auth_users: [
+
+]
+
+# SSL
+nginx_certs_folder: '/etc/nginx/certs/'
+nginx_copy_ssl_certs_files: []
+
+# hosts
+nginx_vhosts: [
+    { server_name: '_', root: '/var/www', template: 'catch_all'},
+]
+

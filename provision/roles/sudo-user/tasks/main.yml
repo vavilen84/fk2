@@ -1,0 +1,4 @@
+- name: add user to sudoers file
+  shell: creates=/etc/sudoers.d/{{item}} touch /etc/sudoers.d/{{item}} && echo '{{item}} ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/{{item}} && chmod 0440 /etc/sudoers.d/{{item}}
+  with_items: '{{ sudo_users }}'
+

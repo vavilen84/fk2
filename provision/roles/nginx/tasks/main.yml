@@ -1,0 +1,197 @@
+---
+# tasks file for nginx
+
+- set_fact: nginx_installed=0
+- set_fact: installed_correct_nginx_version=0
+- set_fact: installed_correct_headers_more_module_version=0
+
+- name: be sure required packages are installed
+  apt: pkg={{ item }} state=present
+  with_items:
+    - make
+    - gcc
+    - g++
+    - wget
+    - libpcre3
+    - libpcre3-dev
+    - apache2-utils
+
+- name: determine current nginx version
+  shell: nginx -v 2>&1 | awk '{ print $3; }' | awk -F '/' '{ print $2 }'
+  register: current_nginx_version
+
+- name: determine headers-more-module version
+  shell: nginx -V 2>&1 | tail -n 1  | awk -F 'headers-more-nginx-module-' '{print $2}'
+  register: current_headers_more_module_version
+
+- set_fact: nginx_installed=1
+  when: not current_nginx_version.stderr
+
+- set_fact: installed_correct_headers_more_module_version=1
+  when: current_headers_more_module_version.stdout|string == nginx_headers_more_module_version|string
+
+- set_fact: installed_correct_nginx_version=1
+  when: current_nginx_version.stdout|string == nginx_version|string and
+        (installed_correct_headers_more_module_version == '1' or nginx_include_headers_more_module == false)
+
+- name: download nginx
+  shell: cd /tmp && wget http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz
+  when: installed_correct_nginx_version == '0'
+
+- name: extract nginx
+  shell: cd /tmp && tar -zxvf nginx-{{ nginx_version }}.tar.gz
+  when: installed_correct_nginx_version == '0'
+
+- name: download headers-more-nginx-module
+  shell: cd /tmp && wget {{nginx_headers_more_module_base_url}}v{{nginx_headers_more_module_version}}.tar.gz && tar -zxvf v{{nginx_headers_more_module_version}}.tar.gz
+  when: installed_correct_nginx_version == '0' and nginx_include_headers_more_module == true
+
+- name: configure nginx
+  shell: cd /tmp/nginx-{{ nginx_version }} && ./configure --prefix=/etc/nginx \
+   --sbin-path=/usr/sbin/nginx \
+   --conf-path=/etc/nginx/nginx.conf \
+   --error-log-path=/var/log/nginx/error.log \
+   --http-log-path=/var/log/nginx/access.log \
+   --pid-path=/var/run/nginx.pid \
+   --lock-path=/var/run/nginx.lock \
+   --http-client-body-temp-path=/var/cache/nginx/client_temp \
+   --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+   --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+   --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+   --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+   --user={{ nginx_user }} \
+   --group={{ nginx_group }} \
+   --with-http_ssl_module \
+   --with-http_realip_module \
+   --with-http_addition_module \
+   --with-http_sub_module \
+   --with-http_dav_module \
+   --with-http_flv_module \
+   --with-http_mp4_module \
+   --with-http_gunzip_module \
+   --with-http_gzip_static_module \
+   --with-http_random_index_module \
+   --with-http_secure_link_module \
+   --with-http_stub_status_module \
+   --with-http_auth_request_module \
+   --with-mail \
+   --with-mail_ssl_module \
+   --with-file-aio \
+   {% if nginx_version | version_compare('1.9.5', operator='>=' ) %}--with-http_v2_module{% else %}--with-http_spdy_module{% endif %} \
+   --with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
+   --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed' \
+   --with-ipv6 \
+   {% if nginx_include_headers_more_module %}--add-module=/tmp/headers-more-nginx-module-{{nginx_headers_more_module_version}}{% endif %}
+  when: installed_correct_nginx_version == '0'
+
+- name: compile nginx
+  shell: cd /tmp/nginx-{{ nginx_version }} && make && make install
+  when: installed_correct_nginx_version == '0'
+
+- name: create user nginx
+  user: name=nginx system=yes home=/nonexistent shell=/bin/false
+
+- name: remove old configs
+  file:
+    path: /etc/nginx/
+    state: absent
+
+- name: make sure nginx folder exists
+  file:
+    path: /etc/nginx/
+    state: directory
+
+- name: copy configs
+  copy: src=config/ dest=/etc/nginx/ owner={{nginx_user}} group={{nginx_group}} mode=0664 force=yes
+
+- name: set nginx variables
+  lineinfile: >
+    dest={{ item.dest }}
+    state=present
+    regexp="^{{ item.key }}\s*"
+    line="{{ item.key }} {{ item.value }};"
+    insertbefore="^\?>"
+  with_items:
+  - { dest: /etc/nginx/system/processes.conf, key: "worker_processes", value: "{{ nginx_worker_processes }}" }
+  - { dest: /etc/nginx/system/connections.conf, key: "worker_connections", value: "{{ nginx_worker_connections }}" }
+  - { dest: /etc/nginx/system/http.conf, key: "client_max_body_size", value: "{{ nginx_client_max_body_size }}" }
+  - { dest: /etc/nginx/system/http.conf, key: "keepalive_requests", value: "{{ nginx_keepalive_requests }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "keepalive_timeout", value: "{{ nginx_keepalive_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "client_header_timeout", value: "{{ nginx_client_header_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "client_body_timeout", value: "{{ nginx_client_body_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "send_timeout", value: "{{ nginx_send_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "fastcgi_connect_timeout", value: "{{ nginx_fastcgi_connect_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "fastcgi_send_timeout", value: "{{ nginx_fastcgi_send_timeout }}" }
+  - { dest: /etc/nginx/limits/timeouts.conf, key: "fastcgi_read_timeout", value: "{{ nginx_fastcgi_read_timeout }}" }
+
+- name: set nginx php socket
+  lineinfile: >
+    dest=/etc/nginx/upstreams/php.conf
+    state=present
+    regexp="unix:\s*"
+    line="server  unix:{{ nginx_php_unix_socket }} max_fails=3 fail_timeout=3s;"
+    insertbefore="^\?>"
+
+- name: make sure certs folder exists
+  file:
+    path: "{{ nginx_certs_folder }}"
+    state: directory
+
+- name: copy certs to remote host
+  copy: src={{ item }} dest={{ nginx_certs_folder }}
+  with_items: '{{ nginx_copy_ssl_certs_files }}'
+
+- name: set correct permissions to certs
+  file:
+    path: "{{ nginx_certs_folder }}"
+    mode: 600
+
+- name: remove old basic http auth users file
+  shell: removes={{ nginx_http_basic_auth_file }} rm {{ nginx_http_basic_auth_file }}
+
+- name: create basic http auth users file
+  file:
+    path: "{{ nginx_http_basic_auth_file }}"
+    state: touch
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+
+- name: create basic http auth user
+  shell: htpasswd -b {{ nginx_http_basic_auth_file }} {{ item.user }} {{ item.password }}
+  with_items: '{{ nginx_http_basic_auth_users }}'
+
+- name: make sure sites directory exists
+  file:
+    path: /etc/nginx/sites-enabled/
+    state: directory
+
+- name: configure nginx virtual hosts
+  template: src={{ item.template }}.j2 dest=/etc/nginx/sites-enabled/{{ item.server_name }}.conf
+  with_items: '{{ nginx_vhosts }}'
+
+- name: configure init script for nginx
+  template: src=nginx_init.j2 dest=/etc/init.d/nginx
+
+- name: make init script executable
+  file:
+    path: /etc/init.d/nginx
+    mode: 0755
+
+- name: make sure required dirs exist
+  file:
+    path: "{{ item }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    state: directory
+  with_items:
+      - /var/cache/nginx/client_temp
+      - /var/cache/nginx/proxy_temp
+      - /var/cache/nginx/fastcgi_temp
+      - /var/cache/nginx/scgi_temp
+      - /var/log/nginx/
+
+  notify:
+    - restart nginx
+
+- name: start nginx on boot
+  service: name=nginx state=started enabled=yes

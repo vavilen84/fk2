@@ -1,0 +1,3 @@
+- name: run migrations
+  shell: chdir=/var/www/fk2/ php yii migrate up
+  when: migrate_db

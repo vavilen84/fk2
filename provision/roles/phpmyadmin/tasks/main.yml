@@ -1,0 +1,33 @@
+---
+- name: Ensure PHPMyAdmin is installed (Debian).
+  apt: pkg=phpmyadmin state=installed
+
+- name: copy PHPMyAdmin config
+  template: src=config.inc.php.j2 dest=/etc/phpmyadmin/config.inc.php  owner=www-data mode=0644
+
+- name: Reqrite export file
+  template: src=export.php.j2 dest=/etc/phpmyadmin/export.php  owner=www-data mode=0644
+
+- name: Add default username and password for MySQL connection.
+  lineinfile: >
+    dest=/etc/phpmyadmin/config.inc.php
+    state=present
+    regexp="^.+\['{{ item.key }}'\].+$"
+    line="$cfg['Servers'][$i]['{{ item.key }}'] = '{{ item.value }}';"
+    insertbefore="^\?>"
+  with_items:
+  - { key: host, value: "{{ phpmyadmin_mysql_host }}" }
+  - { key: port, value: "{{ phpmyadmin_mysql_port }}" }
+  - { key: socket, value: "{{ phpmyadmin_mysql_socket }}" }
+  - { key: connect_type, value: "{{ phpmyadmin_mysql_connect_type }}" }
+  - { key: user, value: "{{ phpmyadmin_mysql_user }}" }
+  - { key: password, value: "{{ phpmyadmin_mysql_password }}"}
+
+- name: Create database for PHPMyAdmin
+  mysql_db: name={{ phpmyadmin_control_database | default('phpmyadmin') }} state=present login_user=root login_password={{ mysql_root_pass }}
+  register: phpmyadmin_database
+
+- name: Import PHPMyAdmin schema
+  mysql_db: name={{ phpmyadmin_control_database | default('phpmyadmin') }} state=import login_user=root login_password={{ mysql_root_pass }}
+            target=/usr/share/doc/phpmyadmin/examples/create_tables.sql.gz
+  when: phpmyadmin_database is defined and phpmyadmin_database.changed == True

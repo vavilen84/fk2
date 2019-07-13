@@ -1,0 +1,14 @@
+- name: be sure system packages are installed
+  apt: pkg={{ item }} state=present
+  with_items:
+    - git-core
+    - curl
+    - wget
+    - htop
+    - python-psycopg2
+    - libpq-dev
+    - python-mysqldb
+    - unzip
+    - zip
+    - expect-dev
+    - mc
