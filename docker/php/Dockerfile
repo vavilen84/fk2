@@ -1,16 +1,17 @@
-FROM php:7.1-fpm-jessie
+FROM php:7.3-fpm
 
 ENV PHPREDIS_VERSION 3.1.6
 
-
 # Mcrypt
-RUN apt-get update && apt-get install -y libmcrypt-dev && docker-php-ext-install -j$(nproc) mcrypt
+RUN apt-get update && apt-get install -y libmcrypt-dev \
+    && pecl install mcrypt-1.0.2 \
+    && docker-php-ext-enable mcrypt
 
 # GD
-RUN apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
-RUN docker-php-ext-configure gd  \
-    --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd
+RUN apt-get update && apt-get install -y libpng-dev libwebp-dev libfreetype6-dev libjpeg62-turbo-dev libxpm-dev \
+    && docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
+    --with-png-dir --with-zlib-dir --with-xpm-dir
+RUN docker-php-ext-install gd
 
 # PDO
 RUN docker-php-ext-install -j$(nproc) pdo
@@ -46,7 +47,7 @@ RUN apt-get update && \
 
 #composer fixes (exhausted memory error) - comment if not sure
 RUN touch /usr/local/etc/php/conf.d/memory_limit.ini \
-    && echo "memory_limit = 2000M;" >> /usr/local/etc/php/conf.d/memory_limit.ini
+    && echo "memory_limit = 4000M;" >> /usr/local/etc/php/conf.d/memory_limit.ini
 
 #RUN curl --silent --show-error https://getcomposer.org/installer | php
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

@@ -25,7 +25,7 @@ services:
       env_file:
         - .env
       volumes:
-          - "./:${WORKING_DIR}"
+          - "./app/:${WORKING_DIR}"
           - "/tmp:/tmp"
       networks:
           - local
