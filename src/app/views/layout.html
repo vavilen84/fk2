@@ -11,23 +11,29 @@
 <header>
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a class="nav-link active" href="/">Home</a>
+            <a class="nav-link active" href="/">Главная</a>
         </li>
         {{if .IsLoggedIn}}
             <li class="nav-item">
-                <a class="nav-link" href="/post/create">Create Post</a>
+                <a class="nav-link" href="/post/create">Написать Статью</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/auth/logout">Logout</a>
+                <a class="nav-link" href="/auth/logout">Выйти</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/auth/profile?id=">Профиль</a>
             </li>
         {{else}}
             <li class="nav-item">
-                <a class="nav-link" href="/auth/login">Login</a>
+                <a class="nav-link" href="/auth/login">Войти</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/auth/register">Register</a>
+                <a class="nav-link" href="/auth/register">Регистрация</a>
             </li>
         {{end}}
+        <li class="nav-item">
+            <a class="nav-link" href="/auth/logout">Участники</a>
+        </li>
     </ul>
 </header>
 <div class="container">

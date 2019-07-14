@@ -17,7 +17,8 @@ func (c *PostController) Create() {
 	c.Data["title"] = "Create New Post"
 	c.Layout = "layout.html"
 	c.TplName = "post/create.html"
-	c.Data["IsLoggedIn"] = auth.ValidateAuth(c.Ctx)
+	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	c.Data["IsLoggedIn"] = isLoggedIn
 }
 
 func (c *PostController) Save() {
@@ -61,5 +62,6 @@ func (c *PostController) Edit() {
 	c.Data["Post"] = post
 	c.Layout = "layout.html"
 	c.TplName = "post/edit.html"
-	c.Data["IsLoggedIn"] = auth.ValidateAuth(c.Ctx)
+	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	c.Data["IsLoggedIn"] = isLoggedIn
 }

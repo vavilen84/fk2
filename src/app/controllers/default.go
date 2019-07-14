@@ -14,7 +14,8 @@ type MainController struct {
 func (c *MainController) Index() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
-	c.Data["IsLoggedIn"] = auth.ValidateAuth(c.Ctx)
+	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	c.Data["IsLoggedIn"] = isLoggedIn
 	or := orm.NewOrm()
 	posts, _ := post.FindAll(or)
 	c.Data["Posts"] = posts

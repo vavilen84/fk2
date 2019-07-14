@@ -7,8 +7,9 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
-	jwt "github.com/gbrlsnchs/jwt/v2"
+	"github.com/gbrlsnchs/jwt/v2"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -87,7 +88,7 @@ func EncodePassword(m *models.User) *models.User {
 	return m
 }
 
-func LoginHandler(m *models.Login, Ctx *context.Context) {
+func LoginHandler(u *models.User, Ctx *context.Context) {
 	now := time.Now()
 	hs256 := jwt.NewHS256("secret")
 	jot := &Token{
@@ -98,7 +99,7 @@ func LoginHandler(m *models.Login, Ctx *context.Context) {
 			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 			NotBefore:      now.Add(30 * time.Minute).Unix(),
 			IssuedAt:       now.Unix(),
-			ID:             "foobar",
+			ID:             strconv.Itoa(int(u.Id)),
 		},
 		IsLoggedIn:  true,
 		CustomField: "myCustomField",
@@ -120,8 +121,7 @@ func LoginHandler(m *models.Login, Ctx *context.Context) {
 	Ctx.SetCookie(tokenName, string(token))
 }
 
-func ValidateAuth(Ctx *context.Context) bool {
-	IsLoggedIn := true
+func ValidateAuth(Ctx *context.Context) (IsLoggedIn bool, jot Token) {
 	now := time.Now()
 	hs256 := jwt.NewHS256("secret")
 	token := Ctx.GetCookie(tokenName)
@@ -129,21 +129,17 @@ func ValidateAuth(Ctx *context.Context) bool {
 	if err != nil {
 		log.Printf("token = %s", err.Error())
 		IsLoggedIn = false
-
-		return IsLoggedIn
+		return
 	}
 	if err = hs256.Verify(payload, sig); err != nil {
 		log.Printf("token = %s", err.Error())
 		IsLoggedIn = false
-
-		return IsLoggedIn
+		return
 	}
-	var jot Token
 	if err = jwt.Unmarshal(payload, &jot); err != nil {
 		log.Printf("token = %s", err.Error())
 		IsLoggedIn = false
-
-		return IsLoggedIn
+		return
 	}
 	iatValidator := jwt.IssuedAtValidator(now)
 	expValidator := jwt.ExpirationTimeValidator(now)
@@ -157,11 +153,9 @@ func ValidateAuth(Ctx *context.Context) bool {
 			log.Printf("token = %s", "aud error")
 		}
 		IsLoggedIn = false
-
-		return IsLoggedIn
+		return
 	}
-
-	return IsLoggedIn
+	return
 }
 
 func Logout(Ctx *context.Context) {

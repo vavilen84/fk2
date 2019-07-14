@@ -3,6 +3,7 @@ package controllers
 import (
 	"app/models"
 	"app/models/auth"
+	"app/models/user"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
@@ -13,10 +14,12 @@ type AuthController struct {
 }
 
 func (c *AuthController) Login() {
+	o := orm.NewOrm()
 	c.Data["title"] = "Login"
 	c.Layout = "layout.html"
 	c.TplName = "auth/login.html"
-	c.Data["IsLoggedIn"] = auth.ValidateAuth(c.Ctx)
+	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	c.Data["IsLoggedIn"] = isLoggedIn
 	if c.Ctx.Input.IsPost() {
 		email := c.GetString("email")
 		password := c.GetString("password")
@@ -25,7 +28,8 @@ func (c *AuthController) Login() {
 		if loginModelValidation.HasErrors() {
 			c.Data["ValidationErrors"] = loginModelValidation.Errors
 		} else {
-			auth.LoginHandler(&m, c.Ctx)
+			u, _ := user.FindByEmail(m.Email, o)
+			auth.LoginHandler(u, c.Ctx)
 			c.Redirect("/", 302)
 		}
 	}
@@ -40,7 +44,8 @@ func (c *AuthController) Register() {
 	c.Data["title"] = "Register"
 	c.Layout = "layout.html"
 	c.TplName = "auth/register.html"
-	c.Data["IsLoggedIn"] = auth.ValidateAuth(c.Ctx)
+	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	c.Data["IsLoggedIn"] = isLoggedIn
 	c.Data["ValidationErrors"] = make([]*validation.Error, 0)
 	if c.Ctx.Input.IsPost() {
 		email := c.GetString("email")
