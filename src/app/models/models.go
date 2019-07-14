@@ -17,10 +17,13 @@ type Login struct {
 }
 
 type User struct {
-	Id       int64  `orm:"auto"`
-	Email    string `orm:"unique"`
-	Password string
-	Salt     string
+	Id        int64  `orm:"auto"`
+	Email     string `orm:"unique"`
+	Password  string
+	Salt      string
+	Role      int64
+	FirstName string
+	LastName  string
 }
 
 func init() {

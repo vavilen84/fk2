@@ -3,6 +3,7 @@ package controllers
 import (
 	"app/models/auth"
 	"app/models/post"
+	"app/models/user"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -26,12 +27,13 @@ func (c *ProfileController) Update() {
 	if e != nil {
 		log.Fatal(e)
 	}
-	c.Data["title"] = "Edit Profile #"
+	c.Data["title"] = "Edit Profile "
 	or := orm.NewOrm()
-	post, _ := post.OneById(int64(id), or)
-	c.Data["Post"] = post
+	user, _ := user.OneById(int64(id), or)
+	c.Data["User"] = user
 	c.Layout = "layout.html"
 	c.TplName = "post/edit.html"
-	isLoggedIn, _ := auth.ValidateAuth(c.Ctx)
+	isLoggedIn, token := auth.ValidateAuth(c.Ctx)
 	c.Data["IsLoggedIn"] = isLoggedIn
+	c.Data["UserId"] = token.JWT.ID
 }
