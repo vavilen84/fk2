@@ -1,18 +1,19 @@
-# Symfony 4.* basic application skeleton includes:
-- Docker (php + nginx + postgres + adminer + redis)
-- Codeception 
-- XDebug
+# Golang (Beego framework) test application
+
+Application includes:
+- basic JWT auth implementation
+- CRUD (create/update/edit/delete post)
+- Models Validation
+- Docker (mysql, phpmyadmin, application containers)
+- Tests
+- Migrations
+- Console command shortcuts
+- Modules
+
 
 ## Install Docker 
 
 https://docs.docker.com/install/
-
-## Create the docker group
-
-```
-$ sudo groupadd docker
-$ sudo usermod -aG docker $USER
-```
 
 ## Install docker-compose 
 
@@ -22,83 +23,93 @@ https://docs.docker.com/compose/install/
 
 https://github.com/iamluc/docker-hostmanager
 
-run docker-hostmanager
+Run manager
+
 ```
 $ docker run -d --name docker-hostmanager --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /etc/hosts:/hosts iamluc/docker-hostmanager
 ```
 
-## Add ENV file
+Beego config don`t support .env vars, so in current implementation all vars (paths, db names, etc) hardcoded. 
+So you need to clone project in /var/www/go-test-app folder to work correct. May be fixed in future.
 
-create .env file from .env.dist file and set correct vars values in it
-
-## XDebug
-
-set alias 10.254.254.254 to 127.0.0.1 network interface
-```
-$ sudo ifconfig lo:0 10.254.254.254 up
-```
-
-##  Start with Docker
+## Start with Docker
 
 ```
-$ docker-compose up -d --build
+$ cd /project/path
+$ docker compose up -d --build
 ```
 
-## Install composer libs
+## Add modules
 
 ```
-$ docker exec -it --user 1000 fk2_php_1 composer install
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# go mod tidy
 ```
 
-## Create database schema
+or
 
 ```
-$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:schema:create
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee rs load:modules
 ```
 
-## Run migrations
+## Create application database schema
 
 ```
-$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:migrations:migrate
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee migrate -conn="root:123456@tcp(db:3306)/godb"
 ```
 
-## Load fixtures
+or
 
 ```
-$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:fixtures:load
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee rs migrate:db
 ```
 
-## Available URLs:
+## Create database schema for tests
 
-"http://site.fk2_local/" - website
-
-"http://adminer.fk2_local:8080/" - adminer
-
-Adminer credentials:<br>
-System: PostgreSQL<br>
-Server: postgres<br>
-Username: symfony<br>
-Password: 123456
-
-## Codeception
-
-run all tests under folder
 ```
-$ docker exec -it --user 1000 fk2_php_1 bash
-$ cd codeception
-$ php ../vendor/bin/codecept run tests/Functional
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee migrate -conn="root:123456@tcp(db:3306)/godb_test"
 ```
 
-run one test in debug mode
+or
+
 ```
-$ docker exec -it --user 1000 fk2_php_1 bash
-$ cd codeception
-$ php ../vendor/bin/codecept run tests/Api/HelloFromTestCest.php --debug
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee rs migrate:test_db
 ```
 
-build tester classes
+## Run tests
+
 ```
-$ docker exec -it --user 1000 fk2_php_1 bash
-$ cd codeception
-$ php ../vendor/bin/codecept build
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# go test ./...
 ```
+
+or 
+
+```
+$ cd /project/path
+$ docker exec -it go-test-app_baseapp_1 bash
+# bee rs test
+```
+
+## Available URLs
+ 
+Application: http://baseapp.go-test-app_local 
+
+PHPMyAdmin: http://pma.go-test-app_local
+
+
+
+
+

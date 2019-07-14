@@ -1,56 +1,46 @@
-version: '3.7'
+version: '3.1'
+
 services:
-  site:
-      working_dir: ${WORKING_DIR}
-      build:
-          context: docker/nginx
-          dockerfile: Dockerfile
-          args:
-            - NGINX_TEMPLATE=${NGINX_TEMPLATE}
-            - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
-            - NGINX_ROOT=${NGINX_ROOT}
-      volumes:
-          - "./:${WORKING_DIR}"
-      networks:
-          - local
-      env_file:
-        - .env
-      depends_on:
-          - php
-  php:
-      working_dir: ${WORKING_DIR}
-      build:
-          context: docker/php
-          dockerfile: Dockerfile
-      env_file:
-        - .env
-      volumes:
-          - "./app/:${WORKING_DIR}"
-          - "/tmp:/tmp"
-      networks:
-          - local
-  postgres:
-      image: postgres:9.6
-      env_file:
-          - .env
-      volumes:
-          - ./docker/postgres/data:/var/lib/postgresql/data
-          - "/tmp:/tmp"
-      networks:
-          - local
-      depends_on:
-          - php
-  adminer:
-      image: adminer
-      env_file:
-        - .env
-      networks:
-          - local
-      ports:
-        - 8080:8080
-  redis:
-      image: redis:4.0.8
-      networks:
-          - local
+
+  baseapp:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    networks:
+      - local
+    tty: true
+    volumes:
+      - "./src/app:/var/www/go-test-app/src/app"
+    working_dir: /var/www/go-test-app/src/app
+    ports:
+      - 80:8000
+
+  db:
+    image: mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_USER: root
+      MYSQL_DATABASE: godb
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+      - "/tmp:/tmp"
+    networks:
+      - local
+    ports:
+      - 3306:3306
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8080:8080'
+    environment:
+      - PMA_ARBITRARY=1
+    restart: always
+    networks:
+      - local
+
 networks:
   local:

@@ -1,2 +1,6 @@
 .idea
+docker/mysql
 .env
+src/app/go.sum
+src/app/main
+src/app/vendor

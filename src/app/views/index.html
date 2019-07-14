@@ -1,0 +1,36 @@
+<h1>{{.title}}</h1>
+<style>
+    .post-item {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        border: 1px solid gray;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .post-content {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+{{range .Posts}}
+    <div class="post-item">
+        <h2>
+            <a href="/post/{{.Id}}">{{.Title}} #{{.Id}}</a>
+        </h2>
+        <div class="post-content">
+            {{.Content}}
+        </div>
+        <div class="post-control-buttons">
+            <a class="btn btn-success" href="/post/edit/{{.Id}}">Edit</a>
+
+                <form class="mt10" method="POST" action="/post/delete">
+                    <input type="hidden" name="id" value="{{.Id}}">
+                    <button onclick="return confirm('Are you sure you want to delete this item?');" type="submit"
+                            class="btn btn-danger">Delete
+                    </button>
+                </form>
+
+        </div>
+    </div>
+{{end}}
