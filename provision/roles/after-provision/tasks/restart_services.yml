@@ -1,8 +1,0 @@
-- name: make sure the mysql restarted
-  service: name=mysql state=restarted enabled=yes
-
-- name: make sure the php7.1-fpm restarted
-  service: name=php7.1-fpm state=restarted enabled=yes
-
-- name: make sure the nginx restarted
-  service: name=nginx state=restarted enabled=yes

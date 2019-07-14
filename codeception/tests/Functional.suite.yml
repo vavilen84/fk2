@@ -1,0 +1,17 @@
+class_name: FunctionalTester
+modules:
+    enabled:
+        - PhpBrowser
+        - REST
+        - Db
+        - Asserts
+    config:
+        PhpBrowser:
+            url: 'http://site.symfony_4_basic_skeleton'
+        REST:
+            depends: PhpBrowser
+            url: 'http://site.symfony_4_basic_skeleton'
+        Db:
+            dsn: 'pgsql:host=postgres;dbname=symfony'
+            user: 'symfony'
+            password: '123456'

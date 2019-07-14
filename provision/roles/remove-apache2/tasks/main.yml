@@ -1,2 +1,0 @@
-- name: remove apache if present
-  apt: pkg=apache2 state=absent purge=yes

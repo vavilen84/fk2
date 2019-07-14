@@ -1,2 +1,0 @@
-- name: remove mcrypt if present
-  apt: pkg=php5-mcrypt state=absent purge=yes

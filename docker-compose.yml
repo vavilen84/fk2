@@ -1,38 +1,56 @@
-version: '3.2'
-
+version: '3.7'
 services:
-
-  frontend:
-    build: frontend
-    ports:
-      - 20080:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-
-  backend:
-    build: backend
-    ports:
-      - 21080:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-
-  mysql:
-    image: mysql:5.7
-    environment:
-      - MYSQL_ROOT_PASSWORD=verysecret
-      - MYSQL_DATABASE=yii2advanced
-      - MYSQL_USER=yii2advanced
-      - MYSQL_PASSWORD=secret
-
-  #pgsql:
-  #  image: postgres:9.5
-  #  environment:
-  #    - POSTGRES_DB=yii2advanced
-  #    - POSTGRES_USER=yii2advanced
-  #    - POSTGRES_PASSWORD=secret
+  site:
+      working_dir: ${WORKING_DIR}
+      build:
+          context: docker/nginx
+          dockerfile: Dockerfile
+          args:
+            - NGINX_TEMPLATE=${NGINX_TEMPLATE}
+            - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
+            - NGINX_ROOT=${NGINX_ROOT}
+      volumes:
+          - "./:${WORKING_DIR}"
+      networks:
+          - local
+      env_file:
+        - .env
+      depends_on:
+          - php
+  php:
+      working_dir: ${WORKING_DIR}
+      build:
+          context: docker/php
+          dockerfile: Dockerfile
+      env_file:
+        - .env
+      volumes:
+          - "./:${WORKING_DIR}"
+          - "/tmp:/tmp"
+      networks:
+          - local
+  postgres:
+      image: postgres:9.6
+      env_file:
+          - .env
+      volumes:
+          - ./docker/postgres/data:/var/lib/postgresql/data
+          - "/tmp:/tmp"
+      networks:
+          - local
+      depends_on:
+          - php
+  adminer:
+      image: adminer
+      env_file:
+        - .env
+      networks:
+          - local
+      ports:
+        - 8080:8080
+  redis:
+      image: redis:4.0.8
+      networks:
+          - local
+networks:
+  local:

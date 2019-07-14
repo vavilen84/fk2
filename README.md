@@ -1,60 +1,104 @@
-<p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
-    </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
-    <br>
-</p>
+# Symfony 4.* basic application skeleton includes:
+- Docker (php + nginx + postgres + adminer + redis)
+- Codeception 
+- XDebug
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+## Install Docker 
 
-The template includes three tiers: front end, back end, and console, each of which
-is a separate Yii application.
+https://docs.docker.com/install/
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
-
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
-
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
-
-DIRECTORY STRUCTURE
--------------------
+## Create the docker group
 
 ```
-common
-    config/              contains shared configurations
-    mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
-    tests/               contains tests for common classes    
-console
-    config/              contains console configurations
-    controllers/         contains console controllers (commands)
-    migrations/          contains database migrations
-    models/              contains console-specific model classes
-    runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for backend application    
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-frontend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains frontend configurations
-    controllers/         contains Web controller classes
-    models/              contains frontend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for frontend application
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-    widgets/             contains frontend widgets
-vendor/                  contains dependent 3rd-party packages
-environments/            contains environment-based overrides
+$ sudo groupadd docker
+$ sudo usermod -aG docker $USER
+```
+
+## Install docker-compose 
+
+https://docs.docker.com/compose/install/
+
+## Install docker-hostmanager
+
+https://github.com/iamluc/docker-hostmanager
+
+run docker-hostmanager
+```
+$ docker run -d --name docker-hostmanager --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /etc/hosts:/hosts iamluc/docker-hostmanager
+```
+
+## Add ENV file
+
+create .env file from .env.dist file and set correct vars values in it
+
+## XDebug
+
+set alias 10.254.254.254 to 127.0.0.1 network interface
+```
+$ sudo ifconfig lo:0 10.254.254.254 up
+```
+
+##  Start with Docker
+
+```
+$ docker-compose up -d --build
+```
+
+## Install composer libs
+
+```
+$ docker exec -it --user 1000 fk2_php_1 composer install
+```
+
+## Create database schema
+
+```
+$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:schema:create
+```
+
+## Run migrations
+
+```
+$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:migrations:migrate
+```
+
+## Load fixtures
+
+```
+$ docker exec -it --user 1000 fk2_php_1 bin/console doctrine:fixtures:load
+```
+
+## Available URLs:
+
+"http://site.fk2_local/" - website
+
+"http://adminer.fk2_local:8080/" - adminer
+
+Adminer credentials:<br>
+System: PostgreSQL<br>
+Server: postgres<br>
+Username: symfony<br>
+Password: 123456
+
+## Codeception
+
+run all tests under folder
+```
+$ docker exec -it --user 1000 fk2_php_1 bash
+$ cd codeception
+$ php ../vendor/bin/codecept run tests/Functional
+```
+
+run one test in debug mode
+```
+$ docker exec -it --user 1000 fk2_php_1 bash
+$ cd codeception
+$ php ../vendor/bin/codecept run tests/Api/HelloFromTestCest.php --debug
+```
+
+build tester classes
+```
+$ docker exec -it --user 1000 fk2_php_1 bash
+$ cd codeception
+$ php ../vendor/bin/codecept build
 ```
