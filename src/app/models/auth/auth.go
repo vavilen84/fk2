@@ -109,13 +109,11 @@ func LoginHandler(u *models.User, Ctx *context.Context) {
 	payload, err := jwt.Marshal(jot)
 	if err != nil {
 		log.Printf("token = %s", err.Error())
-
 		return
 	}
 	token, err := hs256.Sign(payload)
 	if err != nil {
 		log.Printf("token = %s", err.Error())
-
 		return
 	}
 	Ctx.SetCookie(tokenName, string(token))
@@ -128,17 +126,14 @@ func ValidateAuth(Ctx *context.Context) (IsLoggedIn bool, jot Token) {
 	payload, sig, err := jwt.Parse(token)
 	if err != nil {
 		log.Printf("token = %s", err.Error())
-		IsLoggedIn = false
 		return
 	}
 	if err = hs256.Verify(payload, sig); err != nil {
 		log.Printf("token = %s", err.Error())
-		IsLoggedIn = false
 		return
 	}
 	if err = jwt.Unmarshal(payload, &jot); err != nil {
 		log.Printf("token = %s", err.Error())
-		IsLoggedIn = false
 		return
 	}
 	iatValidator := jwt.IssuedAtValidator(now)
@@ -152,9 +147,9 @@ func ValidateAuth(Ctx *context.Context) (IsLoggedIn bool, jot Token) {
 		case jwt.ErrAudValidation:
 			log.Printf("token = %s", "aud error")
 		}
-		IsLoggedIn = false
 		return
 	}
+	IsLoggedIn = true
 	return
 }
 

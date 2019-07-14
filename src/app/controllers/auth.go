@@ -4,6 +4,7 @@ import (
 	"app/models"
 	"app/models/auth"
 	"app/models/user"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
@@ -26,8 +27,10 @@ func (c *AuthController) Login() {
 		m := models.Login{Email: email, Password: password}
 		loginModelValidation := auth.ValidateLoginModel(&m)
 		if loginModelValidation.HasErrors() {
+			fmt.Println("loginModelValidation")
 			c.Data["ValidationErrors"] = loginModelValidation.Errors
 		} else {
+			fmt.Println("LoginHandler")
 			u, _ := user.FindByEmail(m.Email, o)
 			auth.LoginHandler(u, c.Ctx)
 			c.Redirect("/", 302)
