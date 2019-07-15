@@ -1,15 +1,23 @@
 <h1>{{.title}}</h1>
 
-<form action="/post/update" method="POST">
+<form action="/profile/save" method="POST">
     <div class="form-group">
-        <label>Title</label>
-        <input class="form-control" type="text" name="title" value="{{.Post.Title}}">
+        <label>First Name</label>
+        <input class="form-control" type="text" name="first_name" value="{{.User.FirstName}}">
     </div>
     <div class="form-group">
-        <label>Content</label>
-        <textarea class="form-control" name="content">{{.Post.Content}}</textarea>
+        <label>Last Name</label>
+        <input class="form-control" type="text" name="last_name" value="{{.User.LastName}}">
     </div>
-    <input type="hidden" name="id" value="{{.Post.Id}}">
+    <div class="form-group">
+        <label>Email</label>
+        <input class="form-control" type="email" name="email" value="{{.User.Email}}">
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input class="form-control" type="password" name="password">
+    </div>
+    <input type="hidden" name="id" value="{{.User.Id}}">
 
     <input class="btn btn-success" type="submit">
 </form>

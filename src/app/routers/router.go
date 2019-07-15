@@ -15,4 +15,7 @@ func init() {
 	beego.Router("/auth/login", &controllers.AuthController{}, "*:Login")
 	beego.Router("/auth/logout", &controllers.AuthController{}, "Get:Logout")
 	beego.Router("/auth/register", &controllers.AuthController{}, "*:Register")
+
+	beego.Router("/profile/update", &controllers.ProfileController{}, "Get:Update")
+	beego.Router("/profile/save", &controllers.ProfileController{}, "Post:Save")
 }

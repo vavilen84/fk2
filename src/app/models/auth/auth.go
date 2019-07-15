@@ -4,6 +4,7 @@ import (
 	"app/models"
 	"app/models/user"
 	"github.com/anaskhan96/go-password-encoder"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
@@ -34,13 +35,19 @@ func ValidateLoginModel(m *models.Login) *validation.Validation {
 
 	valid.Email(m.Email, "email")
 	or := orm.NewOrm()
-	user, _ := user.FindByEmail(m.Email, or)
-	if user.Id == 0 {
-		valid.SetError("email", "User not found")
+	u, _ := user.FindByEmail(m.Email, or)
+	if u.Id == 0 {
+		err := valid.SetError("email", "User not found")
+		if err != nil {
+			beego.Error(err)
+		}
 	} else {
-		passwordValid := password.Verify(m.Password, user.Salt, user.Password, nil)
+		passwordValid := password.Verify(m.Password, u.Salt, u.Password, nil)
 		if passwordValid == false {
-			valid.SetError("password", "Password is wrong")
+			err := valid.SetError("password", "Password is wrong")
+			if err != nil {
+				beego.Error(err)
+			}
 		}
 	}
 
@@ -66,11 +73,54 @@ func ValidateUserModel(m *models.User) *validation.Validation {
 
 	return &valid
 }
+
+func ValidateUserModelOnUpdate(m *models.User, o orm.Ormer) *validation.Validation {
+	valid := validation.Validation{}
+
+	valid.Required(m.Email, "email")
+	valid.MaxSize(m.Email, 255, "email")
+
+	oldUser, _ := user.OneById(m.Id, o)
+	if oldUser.Email == "" {
+		err := valid.SetError("email", "User not exists")
+		if err != nil {
+			beego.Error(err)
+		}
+	} else {
+		if oldUser.Email != m.Email {
+			existingUser, _ := user.FindByEmail(m.Email, o)
+			if existingUser.Id != 0 {
+				err := valid.SetError("email", "Email is already in use")
+				if err != nil {
+					beego.Error(err)
+				}
+			}
+		}
+	}
+
+	if m.Password != "" {
+		valid.MaxSize(m.Password, 16, "password")
+	}
+
+	valid.Email(m.Email, "email")
+
+	valid.Required(m.FirstName, "first_name")
+	valid.MaxSize(m.FirstName, 255, "first_name")
+
+	valid.Required(m.LastName, "last_name")
+	valid.MaxSize(m.LastName, 255, "last_name")
+
+	return &valid
+}
+
 func ValidateUserModelOnRegister(m *models.User, v *validation.Validation) *validation.Validation {
 	or := orm.NewOrm()
-	user, _ := user.FindByEmail(m.Email, or)
-	if user.Id != 0 {
-		v.SetError("email", "Email is already in use")
+	u, _ := user.FindByEmail(m.Email, or)
+	if u.Id != 0 {
+		err := v.SetError("email", "Email is already in use")
+		if err != nil {
+			beego.Error(err)
+		}
 	}
 
 	return v
@@ -81,6 +131,22 @@ func CreateUser(m *models.User, or orm.Ormer) (orm.Ormer, error) {
 	_, e := or.Insert(m)
 	if e != nil {
 		log.Fatal(e)
+	}
+
+	return or, e
+}
+
+func UpdateUser(m *models.User, or orm.Ormer) (orm.Ormer, error) {
+	oldUser, _ := user.OneById(m.Id, or)
+	if m.Password != "" {
+		m = EncodePassword(m)
+	} else {
+		m.Password = oldUser.Password
+		m.Salt = oldUser.Salt
+	}
+	_, e := or.Update(m)
+	if e != nil {
+		beego.Error(e)
 	}
 
 	return or, e
@@ -110,6 +176,7 @@ func LoginHandler(u *models.User, Ctx *context.Context) {
 		IsLoggedIn:  true,
 		CustomField: "myCustomField",
 	}
+
 	jot.SetAlgorithm(hs256)
 	jot.SetKeyID("kid")
 	payload, err := jwt.Marshal(jot)

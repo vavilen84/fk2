@@ -14,6 +14,7 @@ func initOrm() {
 	dbUser := Cfg.String("db_user")
 	dbPass := Cfg.String("db_pass")
 	dbHost := Cfg.String("db_host")
+
 	dbPort := Cfg.String("db_port")
 	dbName := Cfg.String("db_name")
 	dbLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", dbUser, dbPass, dbHost, dbPort, dbName)
