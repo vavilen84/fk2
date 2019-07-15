@@ -4,3 +4,4 @@ docker/mysql
 src/app/go.sum
 src/app/main
 src/app/vendor
+src/app/app

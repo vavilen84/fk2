@@ -18,3 +18,9 @@ func (c *BaseController) setAuthData() {
 		c.Data["UserId"] = ""
 	}
 }
+
+func (c *BaseController) setRenderData(title, templateName string) {
+	c.Data["title"] = title
+	c.Layout = "layout.html"
+	c.TplName = templateName + ".html"
+}

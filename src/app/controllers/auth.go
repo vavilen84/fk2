@@ -1,10 +1,8 @@
 package controllers
 
 import (
+	"app/auth"
 	"app/models"
-	"app/models/auth"
-	"app/models/user"
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
@@ -16,22 +14,19 @@ type AuthController struct {
 
 func (c *AuthController) Login() {
 	c.setAuthData()
+	c.setRenderData("Login", "auth/login")
 	o := orm.NewOrm()
-	c.Data["title"] = "Login"
-	c.Layout = "layout.html"
-	c.TplName = "auth/login.html"
 	if c.Ctx.Input.IsPost() {
-		email := c.GetString("email")
-		password := c.GetString("password")
-		m := models.Login{Email: email, Password: password}
-		loginModelValidation := auth.ValidateLoginModel(&m)
-		if loginModelValidation.HasErrors() {
-			fmt.Println("loginModelValidation")
-			c.Data["ValidationErrors"] = loginModelValidation.Errors
+		loginModel := auth.Login{
+			Email:    c.GetString("email"),
+			Password: c.GetString("password"),
+		}
+		v := auth.ValidateLoginModel(loginModel)
+		if v.HasErrors() {
+			c.Data["ValidationErrors"] = v.Errors
 		} else {
-			fmt.Println("LoginHandler")
-			u, _ := user.FindByEmail(m.Email, o)
-			auth.LoginHandler(u, c.Ctx)
+			user, _ := models.FindUserByEmail(o, loginModel.Email)
+			auth.LoginHandler(user, c.Ctx)
 			c.Redirect("/", 302)
 		}
 	}
