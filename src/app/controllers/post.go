@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"app/models/auth"
 	"app/models/post"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -10,27 +9,30 @@ import (
 )
 
 type PostController struct {
-	beego.Controller
+	BaseController
 }
 
 func (c *PostController) Create() {
+	c.setAuthData()
 	c.Data["title"] = "Create New Post"
 	c.Layout = "layout.html"
 	c.TplName = "post/create.html"
-	isLoggedIn, token := auth.ValidateAuth(c.Ctx)
-	c.Data["IsLoggedIn"] = isLoggedIn
-	c.Data["UserId"] = token.JWT.ID
 }
 
 func (c *PostController) Save() {
+	c.setAuthData()
 	title := c.GetString("title")
 	content := c.GetString("content")
 	or := orm.NewOrm()
-	post.Create(title, content, or)
+	_, err := post.Create(title, content, or)
+	if err != nil {
+		beego.Error(err)
+	}
 	c.Redirect("/", 302)
 }
 
 func (c *PostController) Update() {
+	c.setAuthData()
 	id, e := c.GetInt("id")
 	if e != nil {
 		log.Fatal(e)
@@ -43,6 +45,7 @@ func (c *PostController) Update() {
 }
 
 func (c *PostController) Delete() {
+	c.setAuthData()
 	id, e := c.GetInt("id")
 	if e != nil {
 		log.Fatal(e)
@@ -53,17 +56,15 @@ func (c *PostController) Delete() {
 }
 
 func (c *PostController) Edit() {
+	c.setAuthData()
 	id, e := c.GetInt(":id")
 	if e != nil {
 		log.Fatal(e)
 	}
 	c.Data["title"] = "Edit Post #"
 	or := orm.NewOrm()
-	post, _ := post.OneById(int64(id), or)
-	c.Data["Post"] = post
+	p, _ := post.OneById(int64(id), or)
+	c.Data["Post"] = p
 	c.Layout = "layout.html"
 	c.TplName = "post/edit.html"
-	isLoggedIn, token := auth.ValidateAuth(c.Ctx)
-	c.Data["IsLoggedIn"] = isLoggedIn
-	c.Data["UserId"] = token.JWT.ID
 }

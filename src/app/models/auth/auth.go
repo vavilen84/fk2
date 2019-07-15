@@ -58,6 +58,12 @@ func ValidateUserModel(m *models.User) *validation.Validation {
 
 	valid.Email(m.Email, "email")
 
+	valid.Required(m.FirstName, "first_name")
+	valid.MaxSize(m.FirstName, 255, "first_name")
+
+	valid.Required(m.LastName, "last_name")
+	valid.MaxSize(m.LastName, 255, "last_name")
+
 	return &valid
 }
 func ValidateUserModelOnRegister(m *models.User, v *validation.Validation) *validation.Validation {

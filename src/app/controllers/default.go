@@ -1,20 +1,16 @@
 package controllers
 
 import (
-	"app/models/auth"
 	"app/models/post"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
 type MainController struct {
-	beego.Controller
+	BaseController
 }
 
 func (c *MainController) Index() {
-	isLoggedIn, token := auth.ValidateAuth(c.Ctx)
-	c.Data["IsLoggedIn"] = isLoggedIn
-	c.Data["UserId"] = token.JWT.ID
+	c.setAuthData()
 	or := orm.NewOrm()
 	posts, _ := post.FindAll(or)
 	c.Data["Posts"] = posts
