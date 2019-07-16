@@ -13,11 +13,11 @@ const (
 )
 
 type User struct {
-	Id        int64  `orm:"auto"`
+	Id        int    `orm:"auto"`
 	Email     string `orm:"unique"`
 	Password  string
 	Salt      string
-	Role      int64
+	Role      int
 	FirstName string
 	LastName  string
 }
@@ -30,7 +30,7 @@ func FindUserByEmail(o orm.Ormer, email string) (user User, err error) {
 	return
 }
 
-func FindUserById(o orm.Ormer, id int64) (user User, err error) {
+func FindUserById(o orm.Ormer, id int) (user User, err error) {
 	err = o.QueryTable("user").Filter("id", id).One(&user)
 	if err != nil {
 		beego.Error(err)
@@ -102,12 +102,12 @@ func ValidateUserModelOnRegister(o orm.Ormer, m User) *validation.Validation {
 		beego.Error(err)
 	}
 	if u.Id != 0 {
-		err := v.SetError("email", "Email is already in use")
+		err := valid.SetError("email", "Email is already in use")
 		if err != nil {
 			beego.Error(err)
 		}
 	}
-	return v
+	return &valid
 }
 
 func InsertUser(o orm.Ormer, m User) (err error) {

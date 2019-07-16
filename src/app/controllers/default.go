@@ -17,6 +17,5 @@ func (c *MainController) Index() {
 }
 
 func (c *MainController) PageNotFound() {
-	c.setResponseData("Resource Not Found :(", "404")
-	c.Ctx.Output.Status = 404
+	c.setResponseData("404 - Page Not Found :(", "404")
 }

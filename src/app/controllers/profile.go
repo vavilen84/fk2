@@ -2,13 +2,11 @@ package controllers
 
 import (
 	"app/models"
-	"app/models/auth"
-	"app/models/user"
 	"errors"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	"strconv"
 )
 
 type ProfileController struct {
@@ -16,29 +14,23 @@ type ProfileController struct {
 }
 
 func (c *ProfileController) Save() {
-	c.setAuthData()
-	email := c.GetString("email")
-	password := c.GetString("password")
-	firstName := c.GetString("first_name")
-	lastName := c.GetString("last_name")
 	id, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
 	}
 	u := models.User{
-		Id:        int64(id),
-		Email:     email,
-		FirstName: firstName,
-		LastName:  lastName,
-		Password:  password,
+		Id:        id,
+		Email:     c.GetString("email"),
+		FirstName: c.GetString("first_name"),
+		LastName:  c.GetString("last_name"),
+		Password:  c.GetString("password"),
 	}
 	o := orm.NewOrm()
-	userModelValidation := auth.ValidateUserModelOnUpdate(&u, o)
+	userModelValidation := models.ValidateUserModelOnUpdate(o, u)
 	if userModelValidation.HasErrors() {
 		c.Data["ValidationErrors"] = userModelValidation.Errors
 	} else {
-		or := orm.NewOrm()
-		_, err := auth.UpdateUser(&u, or)
+		err := models.UpdateUser(o, u)
 		if err != nil {
 			beego.Error(err)
 		}
@@ -47,21 +39,18 @@ func (c *ProfileController) Save() {
 }
 
 func (c *ProfileController) Update() {
-	c.setAuthData()
-	or := orm.NewOrm()
-	idParam := c.GetString("id")
-	id, err := strconv.Atoi(idParam)
+	o := orm.NewOrm()
+	id, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
 	}
-	u, _ := user.OneById(int64(id), or)
-	if u.Email == "" {
+	user, err := models.FindUserById(o, id)
+	if err == orm.ErrNoRows {
 		err := errors.New("User not exists")
 		beego.Error(err)
 		c.Redirect("/", 302)
 	}
-	c.Data["User"] = u
-	c.Data["title"] = "Edit Profile: " + u.FirstName + " " + u.LastName
-	c.Layout = "layout.html"
-	c.TplName = "profile/update.html"
+	title := fmt.Sprintf("Edit Profile: %s %s", user.FirstName, user.LastName)
+	c.setRenderData(title, "profile/update")
+	c.Data["User"] = user
 }

@@ -1,7 +1,6 @@
 module app
 
 require (
-	github.com/CastAI/database-package v1.0.1 // indirect
 	github.com/anaskhan96/go-password-encoder v0.0.0-20181201075956-886d67a3e91b
 	github.com/astaxie/beego v1.11.1
 	github.com/gbrlsnchs/jwt/v2 v2.0.0
