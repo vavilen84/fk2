@@ -6,12 +6,12 @@ import (
 )
 
 type Post struct {
-	Id      int64 `orm:"auto"`
+	Id      int `orm:"auto"`
 	Title   string
 	Content string
 }
 
-func FindPostById(o orm.Ormer, id int64) (post Post, err error) {
+func FindPostById(o orm.Ormer, id int) (post Post, err error) {
 	err = o.QueryTable("post").Filter("id", id).One(&post)
 	if err != nil {
 		beego.Error(err)
@@ -19,7 +19,7 @@ func FindPostById(o orm.Ormer, id int64) (post Post, err error) {
 	return
 }
 
-func DeleletePostById(o orm.Ormer, id int64) (err error) {
+func DeleletePost(o orm.Ormer, id int) (err error) {
 	_, err = o.QueryTable("post").Filter("id", id).Delete()
 	if err != nil {
 		beego.Error(err)

@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"app/models/post"
+	"app/models"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
+	"strconv"
 )
 
 type PostController struct {
@@ -13,18 +14,16 @@ type PostController struct {
 }
 
 func (c *PostController) Create() {
-	c.setAuthData()
-	c.Data["title"] = "Create New Post"
-	c.Layout = "layout.html"
-	c.TplName = "post/create.html"
+	c.setResponseData("Create New Post", "post/create")
 }
 
 func (c *PostController) Save() {
-	c.setAuthData()
-	title := c.GetString("title")
-	content := c.GetString("content")
-	or := orm.NewOrm()
-	_, err := post.Create(title, content, or)
+	o := orm.NewOrm()
+	post := models.Post{
+		Title:   c.GetString("title"),
+		Content: c.GetString("content"),
+	}
+	err := models.InsertPost(o, post)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -32,39 +31,44 @@ func (c *PostController) Save() {
 }
 
 func (c *PostController) Update() {
-	c.setAuthData()
-	id, e := c.GetInt("id")
-	if e != nil {
-		log.Fatal(e)
+	o := orm.NewOrm()
+	id, err := strconv.Atoi(c.GetString("id"))
+	if err != nil {
+		beego.Error(err)
 	}
-	title := c.GetString("title")
-	content := c.GetString("content")
-	or := orm.NewOrm()
-	post.Update(int64(id), title, content, or)
+	post := models.Post{
+		Id:      id,
+		Title:   c.GetString("title"),
+		Content: c.GetString("content"),
+	}
+	err = models.UpdatePost(o, post)
+	if err != nil {
+		beego.Error(err)
+	}
 	c.Redirect("/", 302)
 }
 
 func (c *PostController) Delete() {
-	c.setAuthData()
-	id, e := c.GetInt("id")
-	if e != nil {
-		log.Fatal(e)
+	id, err := strconv.Atoi(c.GetString("id"))
+	if err != nil {
+		beego.Error(err)
 	}
-	or := orm.NewOrm()
-	post.Del(int64(id), or)
+	o := orm.NewOrm()
+	err = models.DeleletePost(o, id)
 	c.Redirect("/", 302)
 }
 
 func (c *PostController) Edit() {
-	c.setAuthData()
-	id, e := c.GetInt(":id")
-	if e != nil {
-		log.Fatal(e)
+	id, err := strconv.Atoi(c.GetString("id"))
+	if err != nil {
+		beego.Error(err)
 	}
-	c.Data["title"] = "Edit Post #"
-	or := orm.NewOrm()
-	p, _ := post.OneById(int64(id), or)
-	c.Data["Post"] = p
-	c.Layout = "layout.html"
-	c.TplName = "post/edit.html"
+	o := orm.NewOrm()
+	post, err := models.FindPostById(o, id)
+	if err == orm.ErrNoRows {
+		c.Redirect("/404", 302)
+	}
+	title := fmt.Sprintf("Edit Post #%s", c.GetString("id"))
+	c.setRenderData(title, "post/edit")
+	c.Data["Post"] = post
 }

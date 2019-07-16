@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"app/models/post"
+	"app/models"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -10,10 +10,13 @@ type MainController struct {
 }
 
 func (c *MainController) Index() {
-	c.setAuthData()
-	or := orm.NewOrm()
-	posts, _ := post.FindAll(or)
+	c.setResponseData("Home", "index")
+	o := orm.NewOrm()
+	posts, _ := models.FindAllPosts(o)
 	c.Data["Posts"] = posts
-	c.Layout = "layout.html"
-	c.TplName = "index.html"
+}
+
+func (c *MainController) PageNotFound() {
+	c.setResponseData("Resource Not Found :(", "404")
+	c.Ctx.Output.Status = 404
 }

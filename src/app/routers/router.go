@@ -7,6 +7,7 @@ import (
 
 func init() {
 	beego.Router("/", &controllers.MainController{}, "Get:Index")
+	beego.Router("/404", &controllers.MainController{}, "Get:PageNotFound")
 
 	beego.Router("/post/create", &controllers.PostController{}, "Get:Create")
 	beego.Router("/post/save", &controllers.PostController{}, "Post:Save")
