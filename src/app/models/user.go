@@ -38,26 +38,6 @@ func FindUserById(o orm.Ormer, id int64) (user User, err error) {
 	return
 }
 
-func ValidateUserModel(m User) *validation.Validation {
-	valid := validation.Validation{}
-
-	valid.Required(m.Email, "email")
-	valid.MaxSize(m.Email, 255, "email")
-
-	valid.Required(m.Password, "password")
-	valid.MaxSize(m.Password, 16, "password")
-
-	valid.Email(m.Email, "email")
-
-	valid.Required(m.FirstName, "first_name")
-	valid.MaxSize(m.FirstName, 255, "first_name")
-
-	valid.Required(m.LastName, "last_name")
-	valid.MaxSize(m.LastName, 255, "last_name")
-
-	return &valid
-}
-
 func ValidateUserModelOnUpdate(o orm.Ormer, m User) *validation.Validation {
 	valid := validation.Validation{}
 
@@ -100,8 +80,23 @@ func ValidateUserModelOnUpdate(o orm.Ormer, m User) *validation.Validation {
 	return &valid
 }
 
-func ValidateUserModelOnRegister(m User, v *validation.Validation) *validation.Validation {
-	o := orm.NewOrm()
+func ValidateUserModelOnRegister(o orm.Ormer, m User) *validation.Validation {
+	valid := validation.Validation{}
+
+	valid.Required(m.Email, "email")
+	valid.MaxSize(m.Email, 255, "email")
+
+	valid.Required(m.Password, "password")
+	valid.MaxSize(m.Password, 16, "password")
+
+	valid.Email(m.Email, "email")
+
+	valid.Required(m.FirstName, "first_name")
+	valid.MaxSize(m.FirstName, 255, "first_name")
+
+	valid.Required(m.LastName, "last_name")
+	valid.MaxSize(m.LastName, 255, "last_name")
+
 	u, err := FindUserByEmail(o, m.Email)
 	if err != nil {
 		beego.Error(err)

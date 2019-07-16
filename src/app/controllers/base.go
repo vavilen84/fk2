@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"app/models/auth"
+	"app/auth"
 	"github.com/astaxie/beego"
 )
 
@@ -17,6 +17,11 @@ func (c *BaseController) setAuthData() {
 	} else {
 		c.Data["UserId"] = ""
 	}
+}
+
+func (c *BaseController) setResponseData(title, templateName string) {
+	c.setRenderData(title, templateName)
+	c.setAuthData()
 }
 
 func (c *BaseController) setRenderData(title, templateName string) {

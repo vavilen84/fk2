@@ -5,7 +5,6 @@ import (
 	"app/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/validation"
 )
 
 type AuthController struct {
@@ -13,8 +12,7 @@ type AuthController struct {
 }
 
 func (c *AuthController) Login() {
-	c.setAuthData()
-	c.setRenderData("Login", "auth/login")
+	c.setResponseData("Login", "auth/login")
 	o := orm.NewOrm()
 	if c.Ctx.Input.IsPost() {
 		loginModel := auth.Login{
@@ -33,35 +31,25 @@ func (c *AuthController) Login() {
 }
 
 func (c *AuthController) Logout() {
-	c.setAuthData()
 	auth.Logout(c.Ctx)
 	c.Redirect("/", 302)
 }
 
 func (c *AuthController) Register() {
-	c.setAuthData()
-	c.Data["title"] = "Register"
-	c.Layout = "layout.html"
-	c.TplName = "auth/register.html"
-	c.Data["ValidationErrors"] = make([]*validation.Error, 0)
+	c.setResponseData("Register", "auth/register")
 	if c.Ctx.Input.IsPost() {
-		email := c.GetString("email")
-		password := c.GetString("password")
-		firstName := c.GetString("first_name")
-		lastName := c.GetString("last_name")
 		m := models.User{
-			Email:     email,
-			Password:  password,
-			FirstName: firstName,
-			LastName:  lastName,
+			Email:     c.GetString("email"),
+			Password:  c.GetString("password"),
+			FirstName: c.GetString("first_name"),
+			LastName:  c.GetString("last_name"),
 		}
-		userModelValidation := auth.ValidateUserModel(&m)
-		userModelValidation = auth.ValidateUserModelOnRegister(&m, userModelValidation)
+		o := orm.NewOrm()
+		userModelValidation := models.ValidateUserModelOnRegister(o, m)
 		if userModelValidation.HasErrors() {
 			c.Data["ValidationErrors"] = userModelValidation.Errors
 		} else {
-			or := orm.NewOrm()
-			_, err := auth.CreateUser(&m, or)
+			err := models.InsertUser(o, m)
 			if err != nil {
 				beego.Error(err)
 			}
