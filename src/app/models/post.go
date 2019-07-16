@@ -28,7 +28,7 @@ func DeleletePost(o orm.Ormer, id int) (err error) {
 }
 
 func InsertPost(o orm.Ormer, post Post) (err error) {
-	_, err = o.Insert(post)
+	_, err = o.Insert(&post)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -36,7 +36,7 @@ func InsertPost(o orm.Ormer, post Post) (err error) {
 }
 
 func UpdatePost(o orm.Ormer, post Post) (err error) {
-	_, err = o.Update(post)
+	_, err = o.Update(&post)
 	if err != nil {
 		beego.Error(err)
 	}

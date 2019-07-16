@@ -127,7 +127,7 @@ func UpdateUser(o orm.Ormer, m User) (err error) {
 		m.Password = oldUser.Password
 		m.Salt = oldUser.Salt
 	}
-	_, err = o.Update(m)
+	_, err = o.Update(&m)
 	if err != nil {
 		beego.Error(err)
 	}
