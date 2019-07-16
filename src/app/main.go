@@ -6,17 +6,15 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
-var Cfg = beego.AppConfig
-
 func initOrm() {
-	dbUser := Cfg.String("db_user")
-	dbPass := Cfg.String("db_pass")
-	dbHost := Cfg.String("db_host")
-
-	dbPort := Cfg.String("db_port")
-	dbName := Cfg.String("db_name")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
 	dbLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", dbUser, dbPass, dbHost, dbPort, dbName)
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	orm.RegisterDataBase("default", "mysql", dbLink)

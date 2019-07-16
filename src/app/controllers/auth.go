@@ -43,6 +43,7 @@ func (c *AuthController) Register() {
 			Password:  c.GetString("password"),
 			FirstName: c.GetString("first_name"),
 			LastName:  c.GetString("last_name"),
+			Role:      models.RoleUser,
 		}
 		o := orm.NewOrm()
 		userModelValidation := models.ValidateUserModelOnRegister(o, m)
