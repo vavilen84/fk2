@@ -10,16 +10,28 @@ import (
 const (
 	RoleAdmin = 1
 	RoleUser  = 2
+
+	TypeStudent  = 1
+	TypeGraduate = 2
 )
 
 type User struct {
-	Id        int    `orm:"auto"`
-	Email     string `orm:"unique"`
-	Password  string
-	Salt      string
-	Role      int
-	FirstName string
-	LastName  string
+	Id            int    `orm:"auto"`
+	Email         string `orm:"unique"`
+	Password      string
+	Salt          string
+	Role          int
+	FirstName     string
+	LastName      string
+	Type          int
+	About         string
+	PinterestLink string
+	InstagramLink string
+	FacebookLink  string
+	Phone         string
+	Skype         string
+	Telegram      string
+	Avatar        string
 }
 
 func FindUserByEmail(o orm.Ormer, email string) (user User, err error) {

@@ -19,11 +19,19 @@ func (c *ProfileController) Save() {
 		beego.Error(err)
 	}
 	u := models.User{
-		Id:        id,
-		Email:     c.GetString("email"),
-		FirstName: c.GetString("first_name"),
-		LastName:  c.GetString("last_name"),
-		Password:  c.GetString("password"),
+		Id:            id,
+		Email:         c.GetString("email"),
+		FirstName:     c.GetString("first_name"),
+		LastName:      c.GetString("last_name"),
+		Password:      c.GetString("password"),
+		About:         c.GetString("about"),
+		PinterestLink: c.GetString("pinterest_link"),
+		InstagramLink: c.GetString("instagram_link"),
+		FacebookLink:  c.GetString("facebook_link"),
+		Phone:         c.GetString("phone"),
+		Skype:         c.GetString("skype"),
+		Telegram:      c.GetString("telegram"),
+		Avatar:        c.GetString("avatar"),
 	}
 	o := orm.NewOrm()
 	userModelValidation := models.ValidateUserModelOnUpdate(o, u)

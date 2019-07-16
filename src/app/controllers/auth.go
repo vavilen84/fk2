@@ -37,12 +37,17 @@ func (c *AuthController) Logout() {
 
 func (c *AuthController) Register() {
 	c.setResponseData("Register", "auth/register")
+	t, err := c.GetInt("type")
+	if err != nil {
+		beego.Error(err)
+	}
 	if c.Ctx.Input.IsPost() {
 		m := models.User{
 			Email:     c.GetString("email"),
 			Password:  c.GetString("password"),
 			FirstName: c.GetString("first_name"),
 			LastName:  c.GetString("last_name"),
+			Type:      t,
 			Role:      models.RoleUser,
 		}
 		o := orm.NewOrm()
