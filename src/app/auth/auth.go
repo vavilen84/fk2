@@ -2,6 +2,7 @@ package auth
 
 import (
 	"app/models"
+	"encoding/json"
 	"github.com/anaskhan96/go-password-encoder"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
@@ -9,7 +10,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/gbrlsnchs/jwt/v2"
 	"log"
-	"strconv"
+	"os"
 	"time"
 )
 
@@ -19,8 +20,8 @@ const (
 
 type Token struct {
 	*jwt.JWT
-	IsLoggedIn  bool   `json:"isLoggedIn"`
-	CustomField string `json:"customField,omitempty"`
+	IsLoggedIn bool   `json:"isLoggedIn"`
+	User       string `json:"user"`
 }
 
 type Login struct {
@@ -63,21 +64,24 @@ func ValidateLoginModel(m Login) *validation.Validation {
 
 func LoginHandler(u models.User, Ctx *context.Context) {
 	now := time.Now()
-	hs256 := jwt.NewHS256("secret")
+	hs256 := jwt.NewHS256(os.Getenv("SECRET"))
+	userBytes, err := json.Marshal(u)
+	if err != nil {
+		beego.Error(err)
+	}
 	jot := &Token{
 		JWT: &jwt.JWT{
-			Issuer:         "gbrlsnchs",
-			Subject:        "someone",
-			Audience:       "gophers",
+			Issuer:         "",
+			Subject:        "",
+			Audience:       "",
 			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 			NotBefore:      now.Add(30 * time.Minute).Unix(),
 			IssuedAt:       now.Unix(),
-			ID:             strconv.Itoa(int(u.Id)),
+			ID:             "",
 		},
-		IsLoggedIn:  true,
-		CustomField: "myCustomField",
+		IsLoggedIn: true,
+		User:       string(userBytes),
 	}
-
 	jot.SetAlgorithm(hs256)
 	jot.SetKeyID("kid")
 	payload, err := jwt.Marshal(jot)
@@ -93,37 +97,25 @@ func LoginHandler(u models.User, Ctx *context.Context) {
 	Ctx.SetCookie(tokenName, string(token))
 }
 
-func ValidateAuth(Ctx *context.Context) (IsLoggedIn bool, jot Token) {
+func GetToken(Ctx *context.Context) (jot Token) {
 	now := time.Now()
-	hs256 := jwt.NewHS256("secret")
+	hs256 := jwt.NewHS256(os.Getenv("SECRET"))
 	token := Ctx.GetCookie(tokenName)
 	payload, sig, err := jwt.Parse(token)
 	if err != nil {
-		log.Printf("token = %s", err.Error())
 		return
 	}
 	if err = hs256.Verify(payload, sig); err != nil {
-		log.Printf("token = %s", err.Error())
 		return
 	}
 	if err = jwt.Unmarshal(payload, &jot); err != nil {
-		log.Printf("token = %s", err.Error())
 		return
 	}
 	iatValidator := jwt.IssuedAtValidator(now)
 	expValidator := jwt.ExpirationTimeValidator(now)
 	if err = jot.Validate(iatValidator, expValidator); err != nil {
-		switch err {
-		case jwt.ErrIatValidation:
-			log.Printf("token = %s", "iat error")
-		case jwt.ErrExpValidation:
-			log.Printf("token = %s", "exp error")
-		case jwt.ErrAudValidation:
-			log.Printf("token = %s", "aud error")
-		}
 		return
 	}
-	IsLoggedIn = true
 	return
 }
 

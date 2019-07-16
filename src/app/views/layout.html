@@ -14,22 +14,29 @@
             <a class="nav-link active" href="/">Главная</a>
         </li>
         {{if .IsLoggedIn}}
+
+            {{if .IsAdmin}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/post/create">Написать</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/auth/register">Зарегестрировать</a>
+                </li>
+            {{end}}
+
+
             <li class="nav-item">
-                <a class="nav-link" href="/post/create">Написать Статью</a>
+                <a class="nav-link" href="/profile/update?id={{.UserId}}">Профиль</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/auth/logout">Выйти</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/profile/update?id={{.UserId}}">Профиль</a>
-            </li>
+
         {{else}}
             <li class="nav-item">
                 <a class="nav-link" href="/auth/login">Войти</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/auth/register">Регистрация</a>
-            </li>
+
         {{end}}
         <li class="nav-item">
             <a class="nav-link" href="/auth/logout">Участники</a>

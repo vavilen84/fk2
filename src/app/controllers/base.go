@@ -2,6 +2,9 @@ package controllers
 
 import (
 	"app/auth"
+	"app/models"
+	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -10,12 +13,21 @@ type BaseController struct {
 }
 
 func (c *BaseController) setAuthData() {
-	isLoggedIn, token := auth.ValidateAuth(c.Ctx)
-	c.Data["IsLoggedIn"] = isLoggedIn
-	if token.JWT != nil {
-		c.Data["UserId"] = token.JWT.ID
-	} else {
-		c.Data["UserId"] = ""
+	token := auth.GetToken(c.Ctx)
+	fmt.Printf("%+v", token)
+	c.Data["IsLoggedIn"] = token.IsLoggedIn
+	if token.User != "" {
+		var user models.User
+		err := json.Unmarshal([]byte(token.User), &user)
+		if err != nil {
+			beego.Error(err)
+		}
+		c.Data["User"] = user
+		if user.Role == models.RoleAdmin {
+			c.Data["IsAdmin"] = true
+		} else {
+			c.Data["IsAdmin"] = false
+		}
 	}
 }
 

@@ -54,7 +54,7 @@ func (c *AuthController) Register() {
 			if err != nil {
 				beego.Error(err)
 			}
-			c.Redirect("/auth/login", 302)
+			c.Redirect("/", 302)
 		}
 	}
 }

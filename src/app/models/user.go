@@ -134,7 +134,7 @@ func UpdateUser(o orm.Ormer, m User) (err error) {
 	return
 }
 
-func (m User) EncodePassword() {
+func (m *User) EncodePassword() {
 	salt, encodedPwd := password.Encode(m.Password, nil)
 	m.Password = encodedPwd
 	m.Salt = salt

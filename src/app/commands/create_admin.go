@@ -8,6 +8,7 @@ import (
 )
 
 func createAdminUser() {
+	beego.Info("Start create admin ...")
 	admin := models.User{
 		FirstName: os.Getenv("ADMIN_FIRST_NAME"),
 		LastName:  os.Getenv("ADMIN_LAST_NAME"),
@@ -20,6 +21,7 @@ func createAdminUser() {
 	if err != nil {
 		beego.Error(err)
 	}
+	beego.Info("Create admin success!")
 }
 
 func init() {
