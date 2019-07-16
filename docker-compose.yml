@@ -10,6 +10,7 @@ services:
       - local
     volumes:
       - "./src/app:${WORKING_DIR}"
+      - "/tmp:/tmp"
     working_dir: ${WORKING_DIR}
     ports:
       - 80:8000
