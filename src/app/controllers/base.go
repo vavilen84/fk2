@@ -59,12 +59,12 @@ func (c *BaseController) getImageData(imageFormName string) (imagePath, original
 		beego.Error(err)
 		return "", "", ""
 	}
+	originalFilename = header.Filename
 	imagePath, uuid, err = s3.SaveImage(i, ext)
 	if err != nil {
 		beego.Error(err)
 		return "", "", ""
 	}
 	defer file.Close()
-	originalFilename = header.Filename
 	return
 }

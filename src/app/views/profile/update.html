@@ -1,6 +1,6 @@
 <h1>{{.title}}</h1>
 
-<form autocomplete="off" action="/profile/save" method="POST">
+<form action="/profile/save" method="POST" enctype="multipart/form-data">
     <div class="form-group">
         <label>First Name</label>
         <input class="form-control" type="text" name="first_name" value="{{.User.FirstName}}">
@@ -19,35 +19,42 @@
     </div>
     <div class="form-group">
         <label>About</label>
-        <textarea rows="10" cols="45" name="about"  class="form-control" ></textarea>
+        <textarea rows="10" cols="45" name="about"  class="form-control">{{.User.About}}</textarea>
     </div>
     <div class="form-group">
         <label>Pinterest Link</label>
-        <input class="form-control" type="text" name="pinterest_link">
+        <input class="form-control" type="text" name="pinterest_link" value="{{.User.PinterestLink}}">
     </div>
     <div class="form-group">
         <label>Instagram Link</label>
-        <input class="form-control" type="text" name="instagram_link">
+        <input class="form-control" type="text" name="instagram_link" value="{{.User.InstagramLink}}">
     </div>
     <div class="form-group">
         <label>Facebook Link</label>
-        <input class="form-control" type="text" name="facebook_link">
+        <input class="form-control" type="text" name="facebook_link" value="{{.User.FacebookLink}}">
     </div>
     <div class="form-group">
         <label>Phone</label>
-        <input class="form-control" type="text" name="phone">
+        <input class="form-control" type="text" name="phone" value="{{.User.Phone}}">
     </div>
     <div class="form-group">
         <label>Skype</label>
-        <input class="form-control" type="text" name="skype">
+        <input class="form-control" type="text" name="skype" value="{{.User.Skype}}">
     </div>
     <div class="form-group">
         <label>Telegram</label>
-        <input class="form-control" type="text" name="telegram">
+        <input class="form-control" type="text" name="telegram" value="{{.User.Telegram}}">
     </div>
+
+    {{if .User.Avatar}}
+        <div class="form-group">
+            <img alt="" src="{{.User.Avatar}}">
+        </div>
+    {{end}}
+
     <div class="form-group">
         <label>Avatar</label>
-        <input class="form-control" type="file" name="avatar">
+        <input class="form-control" type="file" name="avatar" value="{{.User.Avatar}}">
     </div>
     <input type="hidden" name="id" value="{{.User.Id}}">
 

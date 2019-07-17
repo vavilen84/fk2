@@ -26,6 +26,9 @@ func (c *ProfileController) Save() {
 	}
 
 	imagePath, originalFilename, uuid := c.getImageData("avatar")
+	fmt.Printf("%+v", imagePath)
+	fmt.Printf("%+v", originalFilename)
+	fmt.Printf("%+v", uuid)
 	if imagePath != "" {
 		m := models.Image{
 			Uuid:             uuid,
