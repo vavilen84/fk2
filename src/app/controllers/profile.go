@@ -18,6 +18,9 @@ func (c *ProfileController) Save() {
 	if err != nil {
 		beego.Error(err)
 	}
+
+	file, header, er := this.GetFile("file")
+
 	u := models.User{
 		Id:            id,
 		Email:         c.GetString("email"),
