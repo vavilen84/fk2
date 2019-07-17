@@ -22,9 +22,7 @@ func (m *ImageTableInitial_20190717_210255) Up() {
 	m.SQL("CREATE TABLE image (" +
 		"uuid varchar(255) NOT NULL PRIMARY KEY, " +
 		"original_filename varchar(255), " +
-		"ext varchar(255), " +
-		"filepath text, " +
-		"status int(10)" +
+		"filepath text " +
 		");")
 }
 

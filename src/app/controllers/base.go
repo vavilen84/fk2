@@ -3,9 +3,11 @@ package controllers
 import (
 	"app/auth"
 	"app/models"
+	"app/s3"
+	"app/utils"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
+	"image"
 )
 
 type BaseController struct {
@@ -14,7 +16,6 @@ type BaseController struct {
 
 func (c *BaseController) setAuthData() {
 	token := auth.GetToken(c.Ctx)
-	fmt.Printf("%+v", token)
 	c.Data["IsLoggedIn"] = token.IsLoggedIn
 	if token.User != "" {
 		var user models.User
@@ -40,4 +41,30 @@ func (c *BaseController) setRenderData(title, templateName string) {
 	c.Data["title"] = title
 	c.Layout = "layout.html"
 	c.TplName = templateName + ".html"
+}
+
+func (c *BaseController) getImageData(imageFormName string) (imagePath, originalFilename, uuid string) {
+	file, header, err := c.GetFile(imageFormName)
+	if err != nil {
+		beego.Error(err)
+		return "", "", ""
+	}
+	ext, err := utils.GetImageExtension(file)
+	if err != nil {
+		beego.Error(err)
+		return "", "", ""
+	}
+	i, _, err := image.Decode(file)
+	if err != nil {
+		beego.Error(err)
+		return "", "", ""
+	}
+	imagePath, uuid, err = s3.SaveImage(i, ext)
+	if err != nil {
+		beego.Error(err)
+		return "", "", ""
+	}
+	defer file.Close()
+	originalFilename = header.Filename
+	return
 }

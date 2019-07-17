@@ -1,6 +1,8 @@
 package s3
 
 import (
+	"app/utils"
+	"github.com/astaxie/beego"
 	"image"
 	"os"
 	"path"
@@ -9,18 +11,24 @@ import (
 
 const tempDir = "/tmp"
 
-func SaveImage(image image.Image, ext string) (filePath string, err error) {
-	result, err := SaveImageLocal(image, ext)
+func SaveImage(image image.Image, ext string) (filePath, uuid string, err error) {
+	uuid = utils.GenerateUUID()
+	filePath, err = SaveImageLocal(image, uuid, ext)
 	if err != nil {
-		return result, err
+		beego.Error(err)
+		return
 	}
-	err = SaveImageToS3(result)
+	err = SaveImageToS3(filePath)
 	if err != nil {
-		return result, err
+		beego.Error(err)
+		return
 	}
-	os.Remove(path.Join(tempDir, result))
-
-	return result, err
+	err = os.Remove(path.Join(tempDir, filePath))
+	if err != nil {
+		beego.Error(err)
+		return
+	}
+	return
 }
 
 func generateSubfolderName(fileName string) string {

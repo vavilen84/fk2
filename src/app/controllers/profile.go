@@ -19,7 +19,28 @@ func (c *ProfileController) Save() {
 		beego.Error(err)
 	}
 
-	file, header, er := this.GetFile("file")
+	o := orm.NewOrm()
+	err = o.Begin()
+	if err != nil {
+		beego.Error(err)
+	}
+
+	imagePath, originalFilename, uuid := c.getImageData("avatar")
+	if imagePath != "" {
+		m := models.Image{
+			Uuid:             uuid,
+			OriginalFilename: originalFilename,
+			Filepath:         imagePath,
+		}
+		err = models.InsertImage(o, m)
+		if err != nil {
+			beego.Error(err)
+			err = o.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
+		}
+	}
 
 	u := models.User{
 		Id:            id,
@@ -34,16 +55,28 @@ func (c *ProfileController) Save() {
 		Phone:         c.GetString("phone"),
 		Skype:         c.GetString("skype"),
 		Telegram:      c.GetString("telegram"),
-		Avatar:        c.GetString("avatar"),
+		Avatar:        imagePath,
 	}
-	o := orm.NewOrm()
 	userModelValidation := models.ValidateUserModelOnUpdate(o, u)
 	if userModelValidation.HasErrors() {
 		c.Data["ValidationErrors"] = userModelValidation.Errors
+		err = o.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
 	} else {
 		err := models.UpdateUser(o, u)
 		if err != nil {
 			beego.Error(err)
+			err = o.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
+		} else {
+			err = o.Commit()
+			if err != nil {
+				beego.Error(err)
+			}
 		}
 	}
 	c.Redirect("/", 302)
@@ -56,12 +89,15 @@ func (c *ProfileController) Update() {
 		beego.Error(err)
 	}
 	user, err := models.FindUserById(o, id)
+	fmt.Printf("%+v", err)
+	fmt.Printf("%+v", user)
 	if err == orm.ErrNoRows {
-		err := errors.New("User not exists")
+		err := errors.New("User doesnt exist")
 		beego.Error(err)
 		c.Redirect("/", 302)
 	}
 	title := fmt.Sprintf("Edit Profile: %s %s", user.FirstName, user.LastName)
 	c.setRenderData(title, "profile/update")
 	c.Data["User"] = user
+
 }

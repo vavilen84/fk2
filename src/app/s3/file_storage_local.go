@@ -1,7 +1,6 @@
 package s3
 
 import (
-	"app/utils"
 	"github.com/astaxie/beego"
 	"image"
 	"image/gif"
@@ -12,8 +11,8 @@ import (
 	"path"
 )
 
-func SaveImageLocal(image image.Image, ext string) (filePath string, err error) {
-	fileName := utils.GenerateUUID() + "." + ext
+func SaveImageLocal(image image.Image, uuid, ext string) (filePath string, err error) {
+	fileName := uuid + "." + ext
 	subDir := generateSubfolderName(fileName)
 	result := path.Join(subDir, fileName)
 	dirToSave := path.Join(tempDir, subDir)
