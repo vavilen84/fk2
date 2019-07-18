@@ -18,17 +18,12 @@ func (c *ProfileController) Save() {
 	if err != nil {
 		beego.Error(err)
 	}
-
 	o := orm.NewOrm()
 	err = o.Begin()
 	if err != nil {
 		beego.Error(err)
 	}
-
-	imagePath, originalFilename, uuid := c.getImageData("avatar")
-	fmt.Printf("%+v", imagePath)
-	fmt.Printf("%+v", originalFilename)
-	fmt.Printf("%+v", uuid)
+	imagePath, originalFilename, uuid := c.saveFormFileImageToS3("avatar")
 	if imagePath != "" {
 		m := models.Image{
 			Uuid:             uuid,

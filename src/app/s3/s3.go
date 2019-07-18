@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"app/utils"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -9,14 +10,16 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
-func SaveImageToS3(filePath string) (err error) {
-	localFilePath := path.Join(tempDir, filePath)
+func SaveImageToS3(subDir, filename string) (err error) {
+	tmpDir := utils.GetTmpDir(subDir)
+	filepath := path.Join(tmpDir, filename)
 	bucket := os.Getenv("AWS_S3_BUCKET")
-	file, err := os.Open(localFilePath)
+	file, err := os.Open(filepath)
 	if err != nil {
-		err = errors.New("Unable to open file: " + localFilePath)
+		err = errors.New("Unable to open file: " + filepath)
 		return err
 	}
 	region := os.Getenv("AWS_DEFAULT_REGION")
@@ -26,21 +29,21 @@ func SaveImageToS3(filePath string) (err error) {
 	uploader := s3manager.NewUploader(sess)
 	contentType, err := GetFileContentType(file)
 	if err != nil {
-		err = errors.New("Error get content type: " + filePath)
+		err = errors.New("Error get content type: " + filepath)
 		return err
 	}
 	defer file.Close()
 	_, err = uploader.Upload(&s3manager.UploadInput{
 		ContentType: aws.String(contentType),
 		Bucket:      aws.String(bucket),
-		Key:         aws.String(filePath),
+		Key:         aws.String(path.Join(subDir, filename)),
 		Body:        file,
 	})
 	if err != nil {
-		err = errors.New("Unable to upload file: " + filePath)
+		err = errors.New("Unable to upload file: " + filepath)
 		return err
 	}
-	fmt.Printf("Successfully uploaded: %s", filePath)
+	fmt.Printf("Successfully uploaded: %s", filepath)
 
 	return nil
 }
@@ -60,4 +63,9 @@ func GetFileContentType(out *os.File) (string, error) {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
+}
+
+func GenerateSubfolderName(fileName string) string {
+	currentTime := time.Now()
+	return path.Join(currentTime.Format("2006-01-02"), fileName[:8], fileName[9:13])
 }

@@ -7,7 +7,10 @@ import (
 	"app/utils"
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"image"
+	_ "image/jpeg"
+	_ "image/png"
+	"os"
+	"path"
 )
 
 type BaseController struct {
@@ -43,8 +46,9 @@ func (c *BaseController) setRenderData(title, templateName string) {
 	c.TplName = templateName + ".html"
 }
 
-func (c *BaseController) getImageData(imageFormName string) (imagePath, originalFilename, uuid string) {
+func (c *BaseController) saveFormFileImageToS3(imageFormName string) (filepath, originalFilename, uuid string) {
 	file, header, err := c.GetFile(imageFormName)
+	originalFilename = header.Filename
 	if err != nil {
 		beego.Error(err)
 		return "", "", ""
@@ -54,17 +58,31 @@ func (c *BaseController) getImageData(imageFormName string) (imagePath, original
 		beego.Error(err)
 		return "", "", ""
 	}
-	i, _, err := image.Decode(file)
+	uuid = utils.GenerateUUID()
+	filename := uuid + "." + ext
+	subDir := s3.GenerateSubfolderName(filename)
+	tmpDir := utils.GetTmpDir(subDir)
+	filepath = path.Join(tmpDir, filename)
+	err = os.MkdirAll(tmpDir, 0775)
 	if err != nil {
 		beego.Error(err)
 		return "", "", ""
 	}
-	originalFilename = header.Filename
-	imagePath, uuid, err = s3.SaveImage(i, ext)
+	err = c.SaveToFile(imageFormName, filepath)
 	if err != nil {
 		beego.Error(err)
 		return "", "", ""
 	}
-	defer file.Close()
+	err = s3.SaveImageToS3(subDir, filename)
+	if err != nil {
+		beego.Error(err)
+		return
+	}
+	err = os.Remove(filepath)
+	if err != nil {
+		beego.Error(err)
+		return
+	}
+	filepath = path.Join(subDir, filename)
 	return
 }

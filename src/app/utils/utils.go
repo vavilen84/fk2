@@ -4,6 +4,7 @@ import (
 	"github.com/satori/go.uuid"
 	"image"
 	"io"
+	"path"
 )
 
 func GenerateUUID() string {
@@ -13,4 +14,8 @@ func GenerateUUID() string {
 func GetImageExtension(r io.Reader) (format string, err error) {
 	_, format, err = image.DecodeConfig(r)
 	return
+}
+
+func GetTmpDir(subDir string) string {
+	return path.Join("/tmp", subDir)
 }
