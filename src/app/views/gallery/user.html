@@ -1,0 +1,33 @@
+<h1>{{.title}}</h1>
+<div>
+    <img alt="" src="https://fotokolo-local.s3.eu-central-1.amazonaws.com/{{.User.Avatar}}">
+</div>
+<div>
+    {{.User.About}}
+</div>
+<div>
+    {{.User.Avatar}}
+</div>
+<div>
+    {{.User.PinterestLink}}
+</div>
+<div>
+    {{.User.InstagramLink}}
+</div>
+<div>
+    {{.User.FacebookLink}}
+</div>
+<div>
+    {{.User.Phone}}
+</div>
+<div>
+    {{.User.Skype}}
+</div>
+<div>
+    {{.User.Telegram}}
+</div>
+{{range .ImageList}}
+    <div class="portfolio-item">
+        <img alt="" src="https://fotokolo-local.s3.eu-central-1.amazonaws.com/{{.Filepath}}">
+    </div>
+{{end}}

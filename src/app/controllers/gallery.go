@@ -67,7 +67,7 @@ func (c *GalleryController) UpdatePortfolio() {
 		beego.Error(err)
 	}
 	title := user.FirstName + " " + user.LastName
-	c.setResponseData(title, "gallery/user")
+	c.setResponseData(title, "gallery/update-portfolio")
 	c.Data["User"] = user
 	c.Data["ImageList"] = images
 }
