@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 )
 
 type ProfileController struct {
@@ -39,7 +40,17 @@ func (c *ProfileController) Save() {
 			}
 		}
 	}
+	oldUser, err := models.FindUserById(o, id)
+	if err != nil {
+		err := errors.New("User doesnt exist")
+		beego.Error(err)
+		c.Redirect("/404", 404)
+	}
 
+	// if image is not uploaded - use old one
+	if imagePath == "" {
+		imagePath = oldUser.Avatar
+	}
 	u := models.User{
 		Id:            id,
 		Email:         c.GetString("email"),
@@ -77,7 +88,7 @@ func (c *ProfileController) Save() {
 			}
 		}
 	}
-	c.Redirect("/", 302)
+	c.Redirect("/profile/update?id="+strconv.Itoa(id), 302)
 }
 
 func (c *ProfileController) Update() {
@@ -92,7 +103,7 @@ func (c *ProfileController) Update() {
 	if err == orm.ErrNoRows {
 		err := errors.New("User doesnt exist")
 		beego.Error(err)
-		c.Redirect("/", 302)
+		c.Redirect("/404", 404)
 	}
 	title := fmt.Sprintf("Edit Profile: %s %s", user.FirstName, user.LastName)
 	c.setRenderData(title, "profile/update")

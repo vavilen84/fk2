@@ -48,11 +48,11 @@ func (c *BaseController) setRenderData(title, templateName string) {
 
 func (c *BaseController) saveFormFileImageToS3(imageFormName string) (filepath, originalFilename, uuid string) {
 	file, header, err := c.GetFile(imageFormName)
-	originalFilename = header.Filename
 	if err != nil {
 		beego.Error(err)
 		return "", "", ""
 	}
+	originalFilename = header.Filename
 	ext, err := utils.GetImageExtension(file)
 	if err != nil {
 		beego.Error(err)
