@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 )
 
 type GalleryController struct {
@@ -29,4 +30,24 @@ func (c *GalleryController) Graduate() {
 		beego.Error(err)
 	}
 	c.Data["UserList"] = list
+}
+
+func (c *GalleryController) User() {
+	id, err := strconv.Atoi(c.GetString("id"))
+	if err != nil {
+		beego.Error(err)
+	}
+	o := orm.NewOrm()
+	user, err := models.FindUserById(o, id)
+	if err == orm.ErrNoRows {
+		c.Redirect("/404", 302)
+	}
+	images, err := models.FindImageListByUser(o, user)
+	if err != nil {
+		beego.Error(err)
+	}
+	title := user.FirstName + " " + user.LastName
+	c.setResponseData(title, "gallery/user")
+	c.Data["User"] = user
+	c.Data["ImageList"] = images
 }
