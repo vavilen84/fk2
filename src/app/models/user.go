@@ -50,6 +50,14 @@ func FindUserById(o orm.Ormer, id int) (user User, err error) {
 	return
 }
 
+func FindUserListByType(o orm.Ormer, userType int) (list []User, err error) {
+	_, err = o.QueryTable("user").Filter("type", userType).All(&list)
+	if err != nil {
+		beego.Error(err)
+	}
+	return
+}
+
 func ValidateUserModelOnUpdate(o orm.Ormer, m User) *validation.Validation {
 	valid := validation.Validation{}
 

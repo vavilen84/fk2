@@ -38,6 +38,7 @@ func (c *BaseController) setAuthData() {
 func (c *BaseController) setResponseData(title, templateName string) {
 	c.setRenderData(title, templateName)
 	c.setAuthData()
+	c.Data["AWSS3Url"] = "https://fotokolo-local.s3.eu-central-1.amazonaws.com"
 }
 
 func (c *BaseController) setRenderData(title, templateName string) {

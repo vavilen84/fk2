@@ -21,4 +21,7 @@ func init() {
 
 	beego.Router("/profile/update", &controllers.ProfileController{}, "Get:Update")
 	beego.Router("/profile/save", &controllers.ProfileController{}, "Post:Save")
+
+	beego.Router("/gallery/student", &controllers.GalleryController{}, "Get:Student")
+	beego.Router("/gallery/graduate", &controllers.GalleryController{}, "Get:Graduate")
 }

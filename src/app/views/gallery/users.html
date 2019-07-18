@@ -1,0 +1,11 @@
+<h1>{{.title}}</h1>
+{{range .UserList}}
+    <div class="gallery-user-item">
+        <a href="/gallery/user?id={{.Id}}">
+            <h2>{{.FirstName}} {{.LastName}}</h2>
+            <div class="avatar">
+                <img alt="" src="https://fotokolo-local.s3.eu-central-1.amazonaws.com/{{.Avatar}}">
+            </div>
+        </a>
+    </div>
+{{end}}
