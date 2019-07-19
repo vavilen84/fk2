@@ -15,6 +15,10 @@ ul li {
     float: left;
 }
 
+h1 {
+    margin: 20px 0;
+}
+
 a {
     text-decoration: none;
 }
@@ -56,9 +60,9 @@ header {
 
 .logo {
     float: left;
-    padding-top:20px;
-    padding-left:30px;
-    padding-right:30px;
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .logo a:hover {
@@ -68,8 +72,8 @@ header {
 ul.nav ul {
     display: none;
     position: absolute;
-    padding-top:15px;
-    padding-bottom:15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     background: #303846;
 }
 
@@ -84,43 +88,47 @@ ul.nav li:hover ul {
 
 ul.nav li {
     display: inline-block;
-    padding-left:15px;
-    padding-right:15px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
+
 ul.nav li ul li {
     padding: 5px 15px;
     display: block;
 }
 
 ul.nav {
-    padding-top:22px;
+    padding-top: 22px;
 }
 
 ul.nav a:hover {
     color: white;
 }
 
-.holder{
-    width:1000px;
-    margin:0 auto;
-    max-width:1000px;
+.holder {
+    width: 1000px;
+    margin: 0 auto;
+    max-width: 1000px;
 }
+
 img {
-    max-width:1000px;
+    max-width: 1000px;
 }
 
 .header {
     height: 50px;
 }
 
-    /* Подчерк ссылки (делается через bottom border) */
+/* Подчерк ссылки (делается через bottom border) */
 a {
     /* border-bottom: 1px solid rgba(250, 50, 70, 0.4); */
 }
-a:hover{
+
+a:hover {
     text-underline: none;
     border-bottom: 1px solid rgba(250, 50, 70, 0.4);
 }
+
 /* Все ссылки на белом фоне при наведении меняют цвет на: */
 
 .link-on-white-bg:hover {
@@ -137,6 +145,12 @@ a:hover{
     letter-spacing: 0.03em;
     color: rgb(167, 169, 172);
 }
+
+.container {
+    font: 14px/16px SFUIDisplay-Regular;
+    letter-spacing: 0.03em;
+}
+
 
 .menu:hover {
     color: rgb(255, 255, 255);
@@ -432,4 +446,53 @@ body {
     bottom: 0;
     width: 100%;
     height: 80px;
+}
+
+form {
+    box-sizing: border-box;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: .5rem;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 5px 0 5px 20px;
+    font-size: 1rem;
+    line-height: 1.5;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.btn:hover {
+    cursor: pointer;
+    opacity:0.8;
+}
+
+.btn {
+    color: white;
+    background: rgb(125, 125, 135);
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
