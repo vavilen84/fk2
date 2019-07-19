@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"app/models"
+	"errors"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -53,7 +54,7 @@ func (c *GalleryController) User() {
 }
 
 func (c *GalleryController) UpdatePortfolio() {
-	id, err := strconv.Atoi(c.GetString("userId"))
+	id, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
 	}
@@ -70,4 +71,63 @@ func (c *GalleryController) UpdatePortfolio() {
 	c.setResponseData(title, "gallery/update-portfolio")
 	c.Data["User"] = user
 	c.Data["ImageList"] = images
+}
+
+func (c *GalleryController) AddImageToPortfolio() {
+	id, err := c.GetInt("id")
+	if err != nil {
+		beego.Error(err)
+	}
+
+	o := orm.NewOrm()
+
+	_, err = models.FindUserById(o, id)
+	if err != nil {
+		err := errors.New("User doesnt exist")
+		beego.Error(err)
+		c.Redirect("/404", 404)
+	}
+
+	imagePath, originalFilename, uuid := c.saveFormFileImageToS3("image")
+	if imagePath == "" {
+		c.Redirect("/gallery/update-portfolio?id="+strconv.Itoa(id), 302)
+	}
+
+	err = o.Begin()
+	if err != nil {
+		beego.Error(err)
+	}
+
+	m := models.Image{
+		Uuid:             uuid,
+		OriginalFilename: originalFilename,
+		Filepath:         imagePath,
+	}
+	err = models.InsertImage(o, m)
+	if err != nil {
+		beego.Error(err)
+		err = o.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
+	}
+	imageToUser := models.ImageToUser{
+		ImageUuid: uuid,
+		UserId:    id,
+	}
+	err = models.InsertImageToUser(o, imageToUser)
+	if err != nil {
+		beego.Error(err)
+		err = o.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
+	}
+
+	err = o.Commit()
+	if err != nil {
+		beego.Error(err)
+	}
+
+	c.Redirect("/gallery/update-portfolio?id="+strconv.Itoa(id), 302)
 }

@@ -25,5 +25,7 @@ func init() {
 	beego.Router("/gallery/student", &controllers.GalleryController{}, "Get:Student")
 	beego.Router("/gallery/graduate", &controllers.GalleryController{}, "Get:Graduate")
 	beego.Router("/gallery/user", &controllers.GalleryController{}, "Get:User")
-	beego.Router("/gallery/update-portfolio/:userId", &controllers.GalleryController{}, "Get:UpdatePortfolio")
+	beego.Router("/gallery/update-portfolio", &controllers.GalleryController{}, "Get:UpdatePortfolio")
+	beego.Router("/gallery/add-image-to-portfolio", &controllers.GalleryController{}, "Post:AddImageToPortfolio")
+
 }

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -66,6 +67,12 @@ func GetFileContentType(out *os.File) (string, error) {
 }
 
 func GenerateSubfolderName(fileName string) string {
-	currentTime := time.Now()
-	return path.Join(currentTime.Format("2006-01-02"), fileName[:8], fileName[9:13])
+	year, month, day := time.Now().Date()
+	return path.Join(
+		strconv.Itoa(int(year)),
+		strconv.Itoa(int(month)),
+		strconv.Itoa(int(day)),
+		fileName[:8],
+		fileName[9:13],
+	)
 }

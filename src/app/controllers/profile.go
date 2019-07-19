@@ -20,10 +20,19 @@ func (c *ProfileController) Save() {
 		beego.Error(err)
 	}
 	o := orm.NewOrm()
+
+	oldUser, err := models.FindUserById(o, id)
+	if err != nil {
+		err := errors.New("User doesnt exist")
+		beego.Error(err)
+		c.Redirect("/404", 404)
+	}
+
 	err = o.Begin()
 	if err != nil {
 		beego.Error(err)
 	}
+
 	imagePath, originalFilename, uuid := c.saveFormFileImageToS3("avatar")
 	if imagePath != "" {
 		m := models.Image{
@@ -39,12 +48,6 @@ func (c *ProfileController) Save() {
 				beego.Error(err)
 			}
 		}
-	}
-	oldUser, err := models.FindUserById(o, id)
-	if err != nil {
-		err := errors.New("User doesnt exist")
-		beego.Error(err)
-		c.Redirect("/404", 404)
 	}
 
 	// if image is not uploaded - use old one
