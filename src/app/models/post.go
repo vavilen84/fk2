@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"strconv"
 )
 
 type Post struct {
@@ -43,8 +44,32 @@ func UpdatePost(o orm.Ormer, post Post) (err error) {
 	return
 }
 
-func FindAllPosts(or orm.Ormer) (posts []Post, err error) {
-	_, err = or.QueryTable("post").All(&posts)
+func FindAllPosts(o orm.Ormer) (posts []Post, err error) {
+	_, err = o.QueryTable("post").All(&posts)
+	if err != nil {
+		beego.Error(err)
+	}
+	return
+}
+
+func CountPosts(o orm.Ormer) int64 {
+	var maps []orm.Params
+	num, err := o.Raw("SELECT count(id) as count FROM post").Values(&maps)
+	if err == nil && num > 0 {
+		i, err := strconv.ParseInt(maps[0]["count"].(string), 10, 64)
+		if err != nil {
+			beego.Error(err)
+		}
+		return i
+	}
+	return 0
+}
+
+func ListPostsByOffsetAndLimit(o orm.Ormer, offset, limit int) (posts []Post, err error) {
+	_, err = o.QueryTable("post").
+		Offset(offset).
+		Limit(limit).
+		All(&posts)
 	if err != nil {
 		beego.Error(err)
 	}

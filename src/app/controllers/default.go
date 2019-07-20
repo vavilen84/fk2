@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"app/models"
+	"fmt"
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/utils/pagination"
 )
 
 type MainController struct {
@@ -12,8 +14,14 @@ type MainController struct {
 func (c *MainController) Index() {
 	c.setResponseData("Home", "index")
 	o := orm.NewOrm()
-	posts, _ := models.FindAllPosts(o)
+
+	postsPerPage := 2
+	fmt.Printf("--- %+v ----", models.CountPosts(o))
+	paginator := pagination.SetPaginator(c.Ctx, postsPerPage, models.CountPosts(o))
+
+	posts, _ := models.ListPostsByOffsetAndLimit(o, paginator.Offset(), postsPerPage)
 	c.Data["Posts"] = posts
+
 }
 
 func (c *MainController) PageNotFound() {

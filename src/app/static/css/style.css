@@ -306,6 +306,22 @@ a:hover {
     color: rgb(250, 50, 70);
 }
 
+.pagination li a:hover {
+    cursor: pointer;
+}
+
+.pagination li.active a {
+    color: black;
+}
+
+.pagination li a {
+    color: rgba(250, 50, 70, 1);
+}
+
+.pagination li {
+    display: inline-block;
+}
+
 .subtext-link:hover {
     color: rgb(125, 125, 135);
 }
