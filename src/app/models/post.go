@@ -6,10 +6,22 @@ import (
 	"strconv"
 )
 
+type PostOnView struct {
+	Id          int
+	Title       string
+	Description string
+	Image       string
+	User        User
+	CreatedAt   string
+}
+
 type Post struct {
-	Id      int `orm:"auto"`
-	Title   string
-	Content string
+	Id        int `orm:"auto"`
+	Title     string
+	Content   string
+	UserId    int
+	CreatedAt int
+	Publish   int
 }
 
 func FindPostById(o orm.Ormer, id int) (post Post, err error) {
@@ -45,7 +57,9 @@ func UpdatePost(o orm.Ormer, post Post) (err error) {
 }
 
 func FindAllPosts(o orm.Ormer) (posts []Post, err error) {
-	_, err = o.QueryTable("post").All(&posts)
+	_, err = o.QueryTable("post").
+		OrderBy("-id").
+		All(&posts)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -67,8 +81,10 @@ func CountPosts(o orm.Ormer) int64 {
 
 func ListPostsByOffsetAndLimit(o orm.Ormer, offset, limit int) (posts []Post, err error) {
 	_, err = o.QueryTable("post").
+		Filter("Publish", 1).
 		Offset(offset).
 		Limit(limit).
+		OrderBy("-id").
 		All(&posts)
 	if err != nil {
 		beego.Error(err)

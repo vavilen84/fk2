@@ -2,7 +2,8 @@ package controllers
 
 import (
 	"app/models"
-	"fmt"
+	"app/settings"
+	"app/utils"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/utils/pagination"
 )
@@ -15,12 +16,11 @@ func (c *MainController) Index() {
 	c.setResponseData("Home", "index")
 	o := orm.NewOrm()
 
-	postsPerPage := 2
-	fmt.Printf("--- %+v ----", models.CountPosts(o))
+	postsPerPage := settings.PostsPerPage
 	paginator := pagination.SetPaginator(c.Ctx, postsPerPage, models.CountPosts(o))
 
 	posts, _ := models.ListPostsByOffsetAndLimit(o, paginator.Offset(), postsPerPage)
-	c.Data["Posts"] = posts
+	c.Data["Posts"] = utils.GetPostOnViewList(o, posts)
 
 }
 

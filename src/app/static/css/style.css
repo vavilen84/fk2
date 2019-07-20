@@ -306,6 +306,10 @@ a:hover {
     color: rgb(250, 50, 70);
 }
 
+h2 a {
+    color: rgba(250, 50, 70, 1);
+}
+
 .pagination li a:hover {
     cursor: pointer;
 }
