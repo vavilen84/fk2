@@ -22,6 +22,7 @@ func initOrm() {
 
 func main() {
 	initOrm()
+
 	beego.SetStaticPath("/static", "static")
 	beego.Run()
 }

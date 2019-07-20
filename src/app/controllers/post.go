@@ -13,6 +13,13 @@ type PostController struct {
 	BaseController
 }
 
+func (c *PostController) EditList() {
+	c.setResponseData("Posts", "post/edit-list")
+	o := orm.NewOrm()
+	posts, _ := models.FindAllPosts(o)
+	c.Data["Posts"] = posts
+}
+
 func (c *PostController) Create() {
 	c.setResponseData("Create New Post", "post/create")
 }
@@ -41,6 +48,7 @@ func (c *PostController) Update() {
 		Title:   c.GetString("title"),
 		Content: c.GetString("content"),
 	}
+	fmt.Printf("%+v", post)
 	err = models.UpdatePost(o, post)
 	if err != nil {
 		beego.Error(err)
