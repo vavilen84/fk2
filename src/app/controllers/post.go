@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"strconv"
+	"time"
 )
 
 type PostController struct {
@@ -26,11 +27,25 @@ func (c *PostController) Create() {
 
 func (c *PostController) Save() {
 	o := orm.NewOrm()
-	post := models.Post{
-		Title:   c.GetString("title"),
-		Content: c.GetString("content"),
+
+	userId, err := strconv.Atoi(c.GetString("user_id"))
+	if err != nil {
+		beego.Error(err)
 	}
-	err := models.InsertPost(o, post)
+	user, err := models.FindUserById(o, userId)
+	if err == orm.ErrNoRows {
+		beego.Info("User not found")
+		c.Redirect("/404", 302)
+	}
+
+	post := models.Post{
+		Title:     c.GetString("title"),
+		Content:   c.GetString("content"),
+		UserId:    user.Id,
+		CreatedAt: int(time.Now().Unix()),
+		Publish:   1,
+	}
+	err = models.InsertPost(o, post)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -39,16 +54,30 @@ func (c *PostController) Save() {
 
 func (c *PostController) Update() {
 	o := orm.NewOrm()
+
+	userId, err := strconv.Atoi(c.GetString("user_id"))
+	if err != nil {
+		beego.Error(err)
+	}
+	_, err = models.FindUserById(o, userId)
+	if err == orm.ErrNoRows {
+		beego.Info("User not found")
+		c.Redirect("/404", 302)
+	}
+
 	id, err := strconv.Atoi(c.GetString("id"))
 	if err != nil {
 		beego.Error(err)
 	}
-	post := models.Post{
-		Id:      id,
-		Title:   c.GetString("title"),
-		Content: c.GetString("content"),
+
+	post, err := models.FindPostById(o, id)
+	if err == orm.ErrNoRows {
+		beego.Info("Post not found")
+		c.Redirect("/404", 302)
 	}
-	fmt.Printf("%+v", post)
+	post.Title = c.GetString("title")
+	post.Content = c.GetString("content")
+
 	err = models.UpdatePost(o, post)
 	if err != nil {
 		beego.Error(err)
