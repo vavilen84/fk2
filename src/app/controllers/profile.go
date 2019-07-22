@@ -110,7 +110,7 @@ func (c *ProfileController) Update() {
 		c.Redirect("/404", 404)
 	}
 	title := fmt.Sprintf("Edit Profile: %s %s", user.FirstName, user.LastName)
-	c.setRenderData(title, "profile/update")
+	c.setResponseData(title, "profile/update")
 	c.Data["User"] = user
 
 }

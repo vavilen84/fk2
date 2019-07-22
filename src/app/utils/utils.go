@@ -67,7 +67,7 @@ func getPostDescription(html string) (result string) {
 func parseImageFromHtml(html string) (result string) {
 	images := findImages(html)
 	if len(images) > 0 {
-		result = images[0]
+		result = "<img src='" + images[0] + "' alt=''>"
 	}
 	return
 }

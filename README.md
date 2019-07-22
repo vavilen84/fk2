@@ -58,9 +58,9 @@ $ docker exec -it go-test-app_baseapp_1 bash
 ## Create application database schema
 
 ```
-$ cd /project/path
-$ docker exec -it go-test-app_baseapp_1 bash
-# bee migrate -conn="root:123456@tcp(db:3306)/godb"
+cd /project/path
+docker exec -it fk2_baseapp_1 bash
+bee migrate -conn="root:123456@tcp(db:3306)/godb"
 ```
 
 or

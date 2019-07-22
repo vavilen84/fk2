@@ -7,6 +7,7 @@ import (
 	"app/utils"
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
@@ -26,9 +27,18 @@ func (c *BaseController) setAuthData() {
 		if err != nil {
 			beego.Error(err)
 		}
+
 		c.Data["User"] = user
+
+		o := orm.NewOrm()
+		_, err = models.FindUserById(o, user.Id)
+		if err == orm.ErrNoRows {
+			auth.Logout(c.Ctx)
+		}
+
 		if user.Role == models.RoleAdmin {
 			c.Data["IsAdmin"] = true
+
 		} else {
 			c.Data["IsAdmin"] = false
 		}

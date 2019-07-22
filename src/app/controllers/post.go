@@ -106,6 +106,6 @@ func (c *PostController) Edit() {
 		c.Redirect("/404", 302)
 	}
 	title := fmt.Sprintf("Edit Post #%s", c.GetString("id"))
-	c.setRenderData(title, "post/edit")
+	c.setResponseData(title, "post/edit")
 	c.Data["Post"] = post
 }

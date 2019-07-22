@@ -19,7 +19,7 @@ func init() {
 
 // Run the migrations
 func (m *PostAddCreatedAt_20190721_000553) Up() {
-	m.SQL("ALTER TABLE user ADD COLUMN created_at int")
+	m.SQL("ALTER TABLE post ADD COLUMN created_at int")
 }
 
 // Reverse the migrations

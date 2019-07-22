@@ -129,6 +129,15 @@ a:hover {
     border-bottom: 1px solid rgba(250, 50, 70, 0.4);
 }
 
+.post-content a, .post-title a{
+    color: rgba(250, 50, 70, 1);
+}
+
+.post-title a {
+    font-size: 2em;
+    font-weight:bold;
+}
+
 /* Все ссылки на белом фоне при наведении меняют цвет на: */
 
 .link-on-white-bg:hover {
@@ -304,6 +313,14 @@ a:hover {
     border-bottom: 1px solid rgba(250, 50, 70, 0.4);
     font: 0.824em/1.4 CharisSIL;
     color: rgb(250, 50, 70);
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
 }
 
 h2 a {

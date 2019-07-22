@@ -12,41 +12,50 @@
         margin-top: 10px;
         margin-bottom: 10px;
     }
-    .ql-align-center{
+
+    .ql-align-center {
         text-align: center;
     }
 </style>
 {{range .Posts}}
     <div class="post-item" data-id="{{.Id}}">
-        <h2>
-            <a href="/post/view?id={{.Id}}">{{.Title}} #{{.Id}}</a>
-        </h2>
-        <div class="post-content">
-            {{str2html .Content}}
+        <div style="max-width:20%;" class="fl">
+            {{str2html .Image}}
         </div>
+        <div  style="max-width:80%;" class="fl">
+            <span class="post-title">
+                <a href="/post/view?id={{.Id}}">{{.Title}} #{{.Id}}</a>
+            </span>
+            <br>
+            <br>
+            <span class="post-content">
+                {{str2html .Description}}
+            </span>
+        </div>
+        <div class="clear"></div>
     </div>
 {{end}}
 
-{{/*{{if gt .paginator.PageNums 1}}*/}}
-    <ul class="pagination pagination-sm">
-        {{if .paginator.HasPrev}}
-            <li><a href="{{.paginator.PageLinkFirst}}">Первая</a></li>
-            <li><a href="{{.paginator.PageLinkPrev}}">&lt;</a></li>
-        {{else}}
-            <li class="disabled"><a>Первая</a></li>
-            <li class="disabled"><a>&lt;</a></li>
-        {{end}}
-        {{range $index, $page := .paginator.Pages}}
-            <li{{if $.paginator.IsActive .}} class="active"{{end}}>
-                <a href="{{$.paginator.PageLink $page}}">{{$page}}</a>
-            </li>
-        {{end}}
-        {{if .paginator.HasNext}}
-            <li><a href="{{.paginator.PageLinkNext}}">&gt;</a></li>
-            <li><a href="{{.paginator.PageLinkLast}}">Последняя</a></li>
-        {{else}}
-            <li class="disabled"><a>&gt;</a></li>
-            <li class="disabled"><a>Последняя</a></li>
-        {{end}}
-    </ul>
-{{/*{{end}}*/}}
+{{if gt .paginator.PageNums 1}}
+<ul class="pagination pagination-sm">
+    {{if .paginator.HasPrev}}
+        <li><a href="{{.paginator.PageLinkFirst}}">Первая</a></li>
+        <li><a href="{{.paginator.PageLinkPrev}}">&lt;</a></li>
+    {{else}}
+        <li class="disabled"><a>Первая</a></li>
+        <li class="disabled"><a>&lt;</a></li>
+    {{end}}
+    {{range $index, $page := .paginator.Pages}}
+        <li{{if $.paginator.IsActive .}} class="active"{{end}}>
+            <a href="{{$.paginator.PageLink $page}}">{{$page}}</a>
+        </li>
+    {{end}}
+    {{if .paginator.HasNext}}
+        <li><a href="{{.paginator.PageLinkNext}}">&gt;</a></li>
+        <li><a href="{{.paginator.PageLinkLast}}">Последняя</a></li>
+    {{else}}
+        <li class="disabled"><a>&gt;</a></li>
+        <li class="disabled"><a>Последняя</a></li>
+    {{end}}
+</ul>
+{{end}}
