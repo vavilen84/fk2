@@ -69,6 +69,7 @@ func (c *ProfileController) Save() {
 		Telegram:      c.GetString("telegram"),
 		Avatar:        imagePath,
 		Role:          oldUser.Role,
+		Type:          oldUser.Type,
 	}
 	userModelValidation := models.ValidateUserModelOnUpdate(o, u)
 	if userModelValidation.HasErrors() {
