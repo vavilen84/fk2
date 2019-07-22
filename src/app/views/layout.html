@@ -33,24 +33,25 @@
                     {{if .IsLoggedIn}}
                         {{if .IsAdmin}}
                             <li class="">
-                                <a class="" href="/post/create">Написать</a>
+                                <a class="" href="/post/create">Написать Пост</a>
                             </li>
                             <li class="">
-                                <a class="" href="/post/edit-list">Редактировать</a>
+                                <a class="" href="/post/edit-list">Редактировать Пост</a>
                             </li>
                             <li class="">
-                                <a class="" href="/auth/register">Зарегестрировать</a>
+                                <a class="" href="/auth/register">Зарегестрировать Участника</a>
                             </li>
                         {{else}}
                             <li class="">
                                 <a class="" href="/gallery/update-portfolio?id={{.User.Id}}">Портфолио</a>
                             </li>
+                            <li class="">
+                                <a class="" href="/profile/update?id={{.User.Id}}">Профиль</a>
+                            </li>
                         {{end}}
 
 
-                        <li class="">
-                            <a class="" href="/profile/update?id={{.User.Id}}">Профиль</a>
-                        </li>
+
                         <li class="">
                             <a class="" href="/auth/logout">Выйти</a>
                         </li>

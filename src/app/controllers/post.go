@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"app/models"
+	"app/utils"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -18,7 +19,7 @@ func (c *PostController) EditList() {
 	c.setResponseData("Posts", "post/edit-list")
 	o := orm.NewOrm()
 	posts, _ := models.FindAllPosts(o)
-	c.Data["Posts"] = posts
+	c.Data["Posts"] = utils.GetPostOnViewList(o, posts)
 }
 
 func (c *PostController) Create() {
@@ -107,5 +108,20 @@ func (c *PostController) Edit() {
 	}
 	title := fmt.Sprintf("Edit Post #%s", c.GetString("id"))
 	c.setResponseData(title, "post/edit")
+	c.Data["Post"] = post
+}
+
+func (c *PostController) View() {
+	id, err := strconv.Atoi(c.GetString("id"))
+	if err != nil {
+		beego.Error(err)
+	}
+	o := orm.NewOrm()
+	post, err := models.FindPostById(o, id)
+	if err == orm.ErrNoRows {
+		c.Redirect("/404", 302)
+	}
+	title := post.Title
+	c.setResponseData(title, "post/view")
 	c.Data["Post"] = post
 }
