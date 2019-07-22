@@ -1,11 +1,31 @@
 <h1>{{.title}}</h1>
-{{range .UserList}}
-    <div class="gallery-user-item">
-        <a href="/gallery/user?id={{.Id}}">
-            <h2>{{.FirstName}} {{.LastName}}</h2>
-            <div class="avatar">
-                <img alt="" src="https://fotokolo-local.s3.eu-central-1.amazonaws.com/{{.Avatar}}">
-            </div>
-        </a>
-    </div>
-{{end}}
+<style>
+    .gallery-user-item{
+        width:25%;
+        max-width:23%;
+        margin: 0 1%;
+    }
+    .avatar img{
+        max-width:100%;
+    }
+    .gallery-user-item h2{
+        text-align: center;
+        margin:10px 0;
+    }
+    .gallery-user-item a{
+        color:#303846;
+    }
+</style>
+<div class="user-container">
+    {{range .UserList}}
+        <div class="fl gallery-user-item">
+            <a href="/gallery/user?id={{.Id}}">
+                <div class="avatar">
+                    <img alt="" src="https://fotokolo-local.s3.eu-central-1.amazonaws.com/{{.Avatar}}">
+                </div>
+                <h2>{{.FirstName}} {{.LastName}}</h2>
+            </a>
+        </div>
+    {{end}}
+    <div class="clear"></div>
+</div>
